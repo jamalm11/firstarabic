@@ -1,0 +1,293 @@
+require('dotenv').config();
+const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
+const Joi = require('joi');
+
+const app = express();
+const PORT = 3001;
+
+// Middleware pour parser le JSON
+app.use(express.json());
+
+// Connexion à Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false }
+});
+
+// Schéma de validation Joi pour une réservation
+const reservationSchema = Joi.object({
+  date: Joi.date().iso().required(),
+  prof_id: Joi.string().min(3).max(50).required(),
+  eleve_id: Joi.string().min(3).max(50).required()
+});
+
+// Middleware d'authentification
+const authenticateToken = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Format: "Bearer <token>"
+
+  if (!token) {
+    return res.status(401).json({ error: "Token manquant" });
+  }
+
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+
+  if (error || !user) {
+    return res.status(401).json({ error: "Token invalide" });
+  }
+
+  req.user = user; // Stocke les infos de l'utilisateur
+  next();
+};
+
+// Route de test racine
+app.get('/', (req, res) => {
+  res.json({ 
+    status: "API FirstArabic opérationnelle !",
+    routes: {
+      réserver: "POST /reserver (authentifié)",
+      login: "POST /login (via Supabase Auth)",
+      profs: "GET /profs (public)"
+    }
+  });
+});
+
+// Route protégée : POST /reserver
+app.post('/reserver', authenticateToken, async (req, res) => {
+  try {
+    const { error: validationError } = reservationSchema.validate(req.body);
+    if (validationError) {
+      return res.status(400).json({ 
+        error: "Données invalides",
+        details: validationError.details[0].message 
+      });
+    }
+
+    const { date, prof_id, eleve_id } = req.body;
+
+    const { data, error } = await supabase
+      .from('cours')
+      .insert([{ 
+        date,
+        prof_id,
+        eleve_id,
+        statut: 'confirmé',
+        created_by: req.user.id
+      }])
+      .select();
+
+    if (error) throw error;
+
+    res.json({ 
+      success: true,
+      reservation: data[0] 
+    });
+
+  } catch (error) {
+    console.error("Erreur:", error.message);
+    res.status(500).json({ error: "Échec de la réservation" });
+  }
+});
+
+// ✅ Route protégée : POST /eleve
+app.post('/eleve', authenticateToken, async (req, res) => {
+  try {
+    const { nom } = req.body;
+    if (!nom || typeof nom !== 'string') {
+      return res.status(400).json({ error: "Nom invalide ou manquant" });
+    }
+    console.log("👤 ID utilisateur connecté :", req.user.id);
+						
+    const { data, error } = await supabase
+      .from('eleves')
+      .insert([
+        {
+          nom,
+          created_by: req.user.id
+        }
+      ])
+      .select();
+
+    if (error) throw error;
+
+    res.json({ success: true, eleve: data[0] });
+
+  } catch (error) {
+    console.error("Erreur création élève:", error.message);
+    res.status(500).json({ error: "Échec de la création de l'élève" });
+  }
+});
+
+// ✅ Route publique : GET /profs
+app.get('/profs', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('profs')
+      .select('*');
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    console.error("Erreur /profs:", error.message);
+    res.status(500).json({ error: "Erreur lors de la récupération des profs" });
+  }
+});
+
+// ✅ Route protégée : GET /eleve (profil de l'utilisateur connecté)
+app.get('/eleve', authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('eleves')
+      .select('*')
+      .eq('created_by', req.user.id)
+      .single(); // un seul profil attendu
+
+    if (error || !data) {
+      return res.status(404).json({ error: "Profil élève non trouvé" });
+    }
+
+    res.json({ eleve: data });
+  } catch (error) {
+    console.error("Erreur GET /eleve:", error.message);
+    res.status(500).json({ error: "Erreur lors de la récupération du profil élève" });
+  }
+});
+
+// ✅ Route protégée : PUT /eleve (mise à jour du profil élève)
+app.put('/eleve', authenticateToken, async (req, res) => {
+  const { nom } = req.body;
+
+  if (!nom || typeof nom !== 'string') {
+    return res.status(400).json({ error: "Nom invalide ou manquant" });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('eleves')
+      .update({ nom })
+      .eq('created_by', req.user.id)
+      .select();
+
+    if (error || !data || data.length === 0) {
+      return res.status(404).json({ error: "Profil élève introuvable ou non modifié" });
+    }
+
+    res.json({ success: true, eleve: data[0] });
+  } catch (error) {
+    console.error("Erreur PUT /eleve:", error.message);
+    res.status(500).json({ error: "Erreur lors de la mise à jour du profil élève" });
+  }
+});
+
+// Route publique pour obtenir le détail d'un prof par ID
+app.get('/profs/:id', async (req, res) => {
+  const profId = req.params.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('profs')
+      .select('*')
+      .eq('id', profId)
+      .single(); // car on s'attend à un seul résultat
+
+    if (error) {
+      return res.status(404).json({ error: "Professeur non trouvé" });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error("Erreur:", error.message);
+    res.status(500).json({ error: "Erreur lors de la récupération du professeur" });
+  }
+});
+
+// ✅ Route PUT pour mettre à jour les disponibilités d’un prof
+app.put('/profs/:id', authenticateToken, async (req, res) => {
+  const profId = req.params.id;
+  const { disponibilites } = req.body;
+
+  try {
+    // Vérifie si le prof existe et s'il a été créé par l'utilisateur connecté
+    const { data: prof, error: findError } = await supabase
+      .from('profs')
+      .select('id, created_by')
+      .eq('id', profId)
+      .single();
+
+    if (findError || !prof) {
+      return res.status(404).json({ error: "Professeur non trouvé" });
+    }
+
+    if (prof.created_by !== req.user.id) {
+      return res.status(403).json({ error: "Non autorisé à modifier ce profil" });
+    }
+
+    // Mise à jour des disponibilités
+    const { data, error } = await supabase
+      .from('profs')
+      .update({ disponibilites })
+      .eq('id', profId)
+      .select();
+
+    if (error) throw error;
+
+    res.json({ success: true, prof: data[0] });
+
+  } catch (error) {
+    console.error("Erreur PUT /profs/:id:", error.message);
+    res.status(500).json({ error: "Erreur lors de la mise à jour" });
+  }
+});
+
+// ✅ Route protégée : PUT /profs/:id (mise à jour des disponibilités)
+app.put('/profs/:id', authenticateToken, async (req, res) => {
+  const profId = req.params.id;
+  const { disponibilites } = req.body;
+
+  // Validation minimale
+  if (!Array.isArray(disponibilites)) {
+    return res.status(400).json({ error: "Format de disponibilités invalide (doit être un tableau)" });
+  }
+
+  try {
+    // Vérifie que le prof appartient bien à l'utilisateur connecté
+    const { data: existing, error: fetchError } = await supabase
+      .from('profs')
+      .select('id, created_by')
+      .eq('id', profId)
+      .single();
+
+    if (fetchError || !existing) {
+      return res.status(404).json({ error: "Professeur non trouvé" });
+    }
+
+    if (existing.created_by !== req.user.id) {
+      return res.status(403).json({ error: "Non autorisé à modifier ce profil" });
+    }
+
+    // Mise à jour des disponibilités
+    const { data, error } = await supabase
+      .from('profs')
+      .update({ disponibilites })
+      .eq('id', profId)
+      .select();
+
+    if (error) throw error;
+
+    res.json({ success: true, prof: data[0] });
+
+  } catch (error) {
+    console.error("Erreur PUT /profs/:id:", error.message);
+    res.status(500).json({ error: "Erreur lors de la mise à jour des disponibilités" });
+  }
+});
+
+// Démarrer le serveur
+app.listen(PORT, () => {
+  console.log(`API en écoute sur http://localhost:${PORT}`);
+  supabase.from('cours').select('*').limit(1)
+    .then(() => console.log("Connexion Supabase OK"))
+    .catch(e => console.error("Erreur Supabase:", e.message));
+});

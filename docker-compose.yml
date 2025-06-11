@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: firstarabic-api
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:${DB_PASSWORD:-password}@db:5432/firstarabic
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - firstarabic-network
+
+    # ❌ SUPPRIMÉ : ce volume qui écrasait tout
+    # volumes:
+    #   - ./backend:/app:ro
+    #   - node_modules_volume:/app/node_modules
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:15
+    container_name: firstarabic-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: firstarabic
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - firstarabic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d firstarabic"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@firstarabic.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - firstarabic-network
+
+volumes:
+  pg_data:
+    driver: local
+
+networks:
+  firstarabic-network:
+    driver: bridge
