@@ -55,7 +55,7 @@ const profSchema = Joi.object({
 // ========== ROUTES ==========
 
 app.get('/', (req, res) => {
-  res.json({ status: "API FirstArabic opérationnelle !" });
+  res.json({ status: "API FirstArabic operationnelle !" });
 });
 
 // === ELEVE ===
@@ -67,7 +67,7 @@ app.post('/eleve', authenticateToken, async (req, res) => {
     if (error) throw error;
     res.json({ success: true, eleve: data[0] });
   } catch (e) {
-    res.status(500).json({ error: "Erreur création élève", details: e.message });
+    res.status(500).json({ error: "Erreur creation eleve", details: e.message });
   }
 });
 
@@ -77,11 +77,11 @@ app.get('/eleves', authenticateToken, async (req, res) => {
     if (error) throw error;
     res.json({ success: true, eleves: data });
   } catch (e) {
-    res.status(500).json({ error: "Erreur récupération élèves", details: e.message });
+    res.status(500).json({ error: "Erreur recuperation eleves", details: e.message });
   }
 });
 
-// ✅ NOUVELLES ROUTES ELEVE
+//  NOUVELLES ROUTES ELEVE
 app.get('/eleve/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -94,7 +94,7 @@ app.get('/eleve/:id', authenticateToken, async (req, res) => {
     if (error) throw error;
     res.json({ success: true, eleve: data });
   } catch (e) {
-    res.status(404).json({ error: "Élève non trouvé", details: e.message });
+    res.status(404).json({ error: "eleve non trouve", details: e.message });
   }
 });
 
@@ -112,7 +112,7 @@ app.put('/eleve/:id', authenticateToken, async (req, res) => {
     if (error) throw error;
     res.json({ success: true, eleve: data[0] });
   } catch (e) {
-    res.status(500).json({ error: "Erreur mise à jour élève", details: e.message });
+    res.status(500).json({ error: "Erreur mise a jour eleve", details: e.message });
   }
 });
 
@@ -125,9 +125,9 @@ app.delete('/eleve/:id', authenticateToken, async (req, res) => {
       .eq('id', id)
       .eq('created_by', req.user.id);
     if (error) throw error;
-    res.json({ success: true, message: "Élève supprimé" });
+    res.json({ success: true, message: "eleve supprime" });
   } catch (e) {
-    res.status(500).json({ error: "Erreur suppression élève", details: e.message });
+    res.status(500).json({ error: "Erreur suppression eleve", details: e.message });
   }
 });
 
@@ -164,7 +164,7 @@ app.get('/profs', async (req, res) => {
     if (error) throw error;
     res.json({ success: true, profs: data });
   } catch (e) {
-    res.status(500).json({ error: "Erreur récupération profs", details: e.message });
+    res.status(500).json({ error: "Erreur recuperation profs", details: e.message });
   }
 });
 
@@ -174,7 +174,7 @@ app.get('/prof/me', authenticateToken, async (req, res) => {
     if (error) throw error;
     res.json({ success: true, prof: data });
   } catch (e) {
-    res.status(500).json({ error: "Erreur récupération profil prof", details: e.message });
+    res.status(500).json({ error: "Erreur recuperation profil prof", details: e.message });
   }
 });
 
@@ -184,34 +184,93 @@ app.post('/cours', authenticateToken, async (req, res) => {
     const { error: validationError } = reservationSchema.validate(req.body);
     if (validationError) return res.status(400).json({ error: validationError.details[0].message });
     const { date, prof_id, eleve_id } = req.body;
-    const { data, error } = await req.supabase.from('cours').insert([{ date, prof_id, eleve_id, statut: 'confirmé', created_by: req.user.id }]).select();
+    const { data, error } = await req.supabase.from('cours').insert([{ date, prof_id, eleve_id, statut: 'confirme', created_by: req.user.id }]).select();
     if (error) throw error;
     res.json({ success: true, cours: data[0] });
   } catch (e) {
-    res.status(500).json({ error: "Erreur création cours", details: e.message });
+    res.status(500).json({ error: "Erreur creation cours", details: e.message });
   }
 });
 
+
 app.get('/cours', authenticateToken, async (req, res) => {
   try {
-    const { data, error } = await req.supabase.from('cours').select('*');
+    const { data, error } = await req.supabase
+      .from('cours')
+      .select(`
+        id, date, statut,
+        profs (nom),
+        eleves (nom)
+      `);
+
     if (error) throw error;
-    res.json({ success: true, cours: data });
+
+    const coursAvecNoms = data.map(c => ({
+      id: c.id,
+      date: c.date,
+      statut: c.statut,
+      prof_nom: c.profs?.nom || null,
+      eleve_nom: c.eleves?.nom || null
+    }));
+
+    res.json({ success: true, cours: coursAvecNoms });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur rcupration cours enrichis", details: e.message });
+  }
+});
+
+// app.get('/cours', authenticateToken, async (req, res) => {
+//  try {
+//    const { data, error } = await req.supabase.from('cours').select('*');
+//    if (error) throw error;
+//    res.json({ success: true, cours: data });
+//  } catch (e) {
+//    res.status(500).json({ error: "Erreur recuperation cours", details: e.message });
+//  }
+//});
+
+app.get('/cours/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await req.supabase
+      .from('cours')
+      .select(`
+        id, date, statut,
+        profs (nom),
+        eleves (nom)
+      `)
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) return res.status(404).json({ error: "Cours introuvable" });
+
+    res.json({
+      success: true,
+      cours: {
+        id: data.id,
+        date: data.date,
+        statut: data.statut,
+        prof_nom: data.profs?.nom || null,
+        eleve_nom: data.eleves?.nom || null
+      }
+    });
   } catch (e) {
     res.status(500).json({ error: "Erreur récupération cours", details: e.message });
   }
 });
 
-app.get('/cours/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { data, error } = await req.supabase.from('cours').select('*').eq('id', id).maybeSingle();
-    if (error) throw error;
-    res.json({ success: true, cours: data });
-  } catch (e) {
-    res.status(404).json({ error: "Cours non trouvé", details: e.message });
-  }
-});
+//app.get('/cours/:id', authenticateToken, async (req, res) => {
+//  try {
+//    const { id } = req.params;
+//    const { data, error } = await req.supabase.from('cours').select('*').eq('id', id).maybeSingle();
+//    if (error) throw error;
+//    res.json({ success: true, cours: data });
+//  } catch (e) {
+//    res.status(404).json({ error: "Cours non trouve", details: e.message });
+//  }
+//});
 
 app.put('/cours/:id', authenticateToken, async (req, res) => {
   try {
@@ -221,7 +280,7 @@ app.put('/cours/:id', authenticateToken, async (req, res) => {
     if (error) throw error;
     res.json({ success: true, cours: data[0] });
   } catch (e) {
-    res.status(500).json({ error: "Erreur mise à jour cours", details: e.message });
+    res.status(500).json({ error: "Erreur mise a jour cours", details: e.message });
   }
 });
 
@@ -230,12 +289,12 @@ app.delete('/cours/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const { error } = await req.supabase.from('cours').delete().eq('id', id);
     if (error) throw error;
-    res.json({ success: true, message: "Cours supprimé" });
+    res.json({ success: true, message: "Cours supprime" });
   } catch (e) {
     res.status(500).json({ error: "Erreur suppression cours", details: e.message });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`API en écoute sur http://localhost:${PORT}`);
+  console.log(`API en ecoute sur http://localhost:${PORT}`);
 });
