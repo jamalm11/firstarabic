@@ -135,3 +135,70 @@ Développé par **jamalm11**
 Projet personnel pour faciliter l’enseignement de l’arabe à distance.
 
 ---
+==========================================================================================
+
+
+# 🕌 FirstArabic - Backend API
+
+Ce projet fournit une API Node.js + Express connectée à Supabase, pour gérer les utilisateurs, professeurs, élèves, notifications et cours dans le cadre de la plateforme d’apprentissage FirstArabic.
+
+---
+
+## 🗂 Structure du projet
+
+```
+firstarabic/
+├── backend/
+│   ├── index.js                  # Point d’entrée principal de l’API
+│   ├── supabaseClient.js         # Client Supabase connecté avec la clé publique
+│   ├── controllers/              # Contrôleurs (notificationsController.js, etc.)
+│   └── migrations/               # Fichiers SQL de création des tables
+├── test_*.sh                     # Scripts de test d’API
+├── docker-compose.yml            # Conteneurs API, base Postgres, pgAdmin
+├── .env                          # Variables d’environnement
+└── README.md
+```
+
+---
+
+## 🧱 Migrations SQL
+
+Les tables principales et leurs politiques RLS sont définies ici :
+
+| Fichier SQL                            | Description                                 |
+|----------------------------------------|---------------------------------------------|
+| `001_create_notifications.sql`         | Table `notifications` + RLS                 |
+| `002_create_eleves.sql`                | Table `eleves` + RLS                        |
+| `003_create_profs.sql`                 | Table `profs` + RLS                         |
+| `004_create_cours.sql`                 | Table `cours` + RLS + foreign keys          |
+
+---
+
+## ✅ Instructions de déploiement local
+
+```bash
+docker compose up --build
+```
+
+---
+
+## ✅ Tests disponibles
+
+```bash
+./test_notifications.sh   # CRUD Notifications (authentifié)
+./test_eleve.sh           # CRUD Élèves (authentifié)
+./test_prof.sh            # CRUD Professeur (authentifié)
+./test_cours.sh           # CRUD Cours (authentifié)
+```
+
+---
+
+## 🔐 Authentification
+
+Toutes les routes protégées utilisent un token JWT Supabase dans l’en-tête `Authorization: Bearer <token>`.
+
+---
+
+## 📧 Contact
+
+Développé par [Sara Handouf] pour le projet FirstArabic.

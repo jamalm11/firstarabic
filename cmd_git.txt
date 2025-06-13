@@ -1,0 +1,4 @@
+🧱 À chaque fichier de migration :
+	•	Tu fais git add backend/migrations/002_create_eleves.sql
+	•	Puis git commit -m "🧱 Création de la table eleves avec RLS"
+	•	Et git push
