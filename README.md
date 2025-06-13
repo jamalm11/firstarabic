@@ -193,9 +193,42 @@ docker compose up --build
 
 ---
 
+
+## 🧪 Tests API CRUD - Disponibilités
+
+```bash
+# 1. Création d'une disponibilité
+# Requiert un TOKEN valide et un PROF_ID existant (lié à un prof créé par l'utilisateur)
+./test_disponibilites_create.sh
+
+# 2a. Récupération de toutes les disponibilités
+./test_disponibilites_get.sh
+
+# 2b. Récupération d'une disponibilité par ID
+./test_disponibilites_get_by_id.sh
+
+# 3. Mise à jour partielle (PATCH) d'une disponibilité
+# Envoie uniquement les champs à modifier (jour, heure_debut, heure_fin)
+./test_disponibilites_update.sh
+
+# 4. Suppression d'une disponibilité
+./test_disponibilites_delete.sh
+```
+
+📝 **Remarques** :
+- Tous les scripts utilisent `curl` et un `TOKEN` JWT dans l'en-tête.
+- L'utilisateur doit être le `created_by` du `prof_id` associé à la disponibilité.
+- Les RLS de Supabase sont activées et valident cette relation.
+- Adapter manuellement les variables `TOKEN` et `PROF_ID` dans les scripts si besoin.
+
+
+
 ## 🔐 Authentification
 
 Toutes les routes protégées utilisent un token JWT Supabase dans l’en-tête `Authorization: Bearer <token>`.
+
+
+
 
 ---
 
