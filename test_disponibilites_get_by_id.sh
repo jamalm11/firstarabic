@@ -1,0 +1,10 @@
+#!/bin/bash
+
+TOKEN="eyJhbGciOiJIUzI1NiIsImtpZCI6ImpSLzEyeTNFME5kelZvRnQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2Flcmh2eGZ6enB2ZXlra2VkbWVqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjYmM1MzBhNy0wYjJjLTRhYTgtOWVjNC00Y2FlMzQ0OWMzNzAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ5ODE5NzAwLCJpYXQiOjE3NDk4MTYxMDAsImVtYWlsIjoiamFtYWwubWFyb3VhbmVAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDk4MTYxMDB9XSwic2Vzc2lvbl9pZCI6Ijk2MWIzN2E2LTcwZWQtNDk2Zi1iNGU0LTNlN2M5N2JlZDRiNiIsImlzX2Fub255bW91cyI6ZmFsc2V9.-zhmp1NjhXe--6cCG4YO2CkBk5HT4FK3qQ42vlGSSns"
+ID_DISPO=11  # Remplacez par un ID réel
+
+echo "🔍 2b. Récupération d'une disponibilité par ID"
+RESPONSE=$(curl -s -X GET http://localhost:3001/disponibilites/$ID_DISPO \
+  -H "Authorization: Bearer $TOKEN")
+
+echo "Réponse : $RESPONSE"
