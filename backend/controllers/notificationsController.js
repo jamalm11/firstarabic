@@ -1,13 +1,20 @@
 // backend/controllers/notificationsController.js
 
+const { notificationSchema, updateNotificationSchema } = require('../validators/notificationValidator');
+
 // Ce contrôleur utilise req.supabase qui contient un client authentifié (avec JWT)
 const createNotification = async (req, res) => {
-  const { message, type } = req.body;
+  const { error: validationError } = notificationSchema.validate(req.body);
+  if (validationError) {
+    return res.status(400).json({ error: "Données invalides", details: validationError.details[0].message });
+  }
+
+  const { titre, message, lu } = req.body;
   const { id: user_id } = req.user;
 
   const { data, error } = await req.supabase
     .from('notifications')
-    .insert([{ message, type, user_id }])
+    .insert([{ titre, message, lue: lu ?? false, user_id }])
     .select();
 
   if (error) {
