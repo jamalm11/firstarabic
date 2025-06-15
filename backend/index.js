@@ -42,17 +42,8 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-const reservationSchema = Joi.object({
-  date: Joi.date().iso().required(),
-  prof_id: Joi.string().required(),
-  eleve_id: Joi.string().required()
-});
-
-const profSchema = Joi.object({
-  nom: Joi.string().required(),
-  specialite: Joi.string().allow('').optional(),
-  bio: Joi.string().allow('').optional()
-});
+const { coursSchema } = require('./validators/coursValidator');
+const { profSchema } = require('./validators/profValidator');
 
 // ========== ROUTES ==========
 
@@ -191,7 +182,7 @@ app.get('/prof/me', authenticateToken, async (req, res) => {
 // === COURS ===
 app.post('/cours', authenticateToken, async (req, res) => {
   try {
-    const { error: validationError } = reservationSchema.validate(req.body);
+    const { error: validationError } = coursSchema.validate(req.body);
     if (validationError) return res.status(400).json({ error: validationError.details[0].message });
     const { date, prof_id, eleve_id } = req.body;
     const { data, error } = await req.supabase.from('cours').insert([{ date, prof_id, eleve_id, statut: 'confirme', created_by: req.user.id }]).select();
