@@ -1,20 +1,13 @@
-// backend/controllers/notificationsController.js
-
 const { notificationSchema, updateNotificationSchema } = require('../validators/notificationValidator');
 
-// Ce contrôleur utilise req.supabase qui contient un client authentifié (avec JWT)
+// Créer une notification
 const createNotification = async (req, res) => {
-  const { error: validationError } = notificationSchema.validate(req.body);
-  if (validationError) {
-    return res.status(400).json({ error: "Données invalides", details: validationError.details[0].message });
-  }
-
-  const { titre, message, lu } = req.body;
+  const { message, type } = req.body;
   const { id: user_id } = req.user;
 
   const { data, error } = await req.supabase
     .from('notifications')
-    .insert([{ titre, message, lue: lu ?? false, user_id }])
+    .insert([{ message, type, user_id }])
     .select();
 
   if (error) {
@@ -24,21 +17,31 @@ const createNotification = async (req, res) => {
   res.json({ success: true, notification: data[0] });
 };
 
+// Lire les notifications avec pagination et tri
 const getNotifications = async (req, res) => {
   const { id: user_id } = req.user;
+
+  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const limit = Math.max(parseInt(req.query.limit) || 10, 1);
+
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
 
   const { data, error } = await req.supabase
     .from('notifications')
     .select('*')
-    .eq('user_id', user_id);
+    .eq('user_id', user_id)
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   if (error) {
     return res.status(500).json({ error: "Erreur récupération notifications", details: error.message });
   }
 
-  res.json({ success: true, notifications: data });
+  res.json({ success: true, page, limit, notifications: data });
 };
 
+// Marquer une notification comme lue
 const markAsRead = async (req, res) => {
   const { id } = req.params;
   const { id: user_id } = req.user;
@@ -57,6 +60,7 @@ const markAsRead = async (req, res) => {
   res.json({ success: true, notification: data[0] });
 };
 
+// Supprimer une notification
 const deleteNotification = async (req, res) => {
   const { id } = req.params;
   const { id: user_id } = req.user;
