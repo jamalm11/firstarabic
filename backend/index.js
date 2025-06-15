@@ -1,7 +1,9 @@
+
 require('dotenv').config();
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const Joi = require('joi');
+const { eleveSchema } = require('./validators/eleveValidator');
 
 const app = express();
 const PORT = 3001;
@@ -61,8 +63,16 @@ app.get('/', (req, res) => {
 // === ELEVE ===
 app.post('/eleve', authenticateToken, async (req, res) => {
   try {
+    
+//    const { nom } = req.body;
+//    if (!nom) return res.status(400).json({ error: "Nom requis" });
+    
+    const { error: validationError } = eleveSchema.validate(req.body);
+    if (validationError) {
+     return res.status(400).json({ error: "Données invalides", details: validationError.details[0].message });
+    }
     const { nom } = req.body;
-    if (!nom) return res.status(400).json({ error: "Nom requis" });
+   
     const { data, error } = await req.supabase.from('eleves').insert([{ nom, created_by: req.user.id }]).select();
     if (error) throw error;
     res.json({ success: true, eleve: data[0] });
@@ -294,6 +304,27 @@ app.delete('/cours/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Erreur suppression cours", details: e.message });
   }
 });
+
+
+// notifications
+const notificationsController = require("./controllers/notificationsController");
+
+app.post("/notifications", authenticateToken, notificationsController.createNotification);
+app.get("/notifications", authenticateToken, notificationsController.getNotifications);
+app.put("/notifications/:id", authenticateToken, notificationsController.markAsRead);
+app.delete("/notifications/:id", authenticateToken, notificationsController.deleteNotification);
+
+// disponibilite
+const disponibilitesController = require("./controllers/disponibilitesController");
+
+app.post("/disponibilites", authenticateToken, disponibilitesController.createDisponibilite);
+app.get("/disponibilites", authenticateToken, disponibilitesController.getDisponibilites);
+
+app.get("/disponibilites/:id", authenticateToken, disponibilitesController.getDisponibiliteById);
+app.put("/disponibilites/:id", authenticateToken, disponibilitesController.updateDisponibilite);
+app.delete("/disponibilites/:id", authenticateToken, disponibilitesController.deleteDisponibilite);
+app.patch("/disponibilites/:id", authenticateToken, disponibilitesController.updateDisponibilite);
+
 
 app.listen(PORT, () => {
   console.log(`API en ecoute sur http://localhost:${PORT}`);
