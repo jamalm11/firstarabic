@@ -321,6 +321,7 @@ app.post("/reservations", authenticateToken, reservationsController.createReserv
 app.get("/reservations", authenticateToken, reservationsController.getReservations);
 app.get("/reservations/:id", authenticateToken, reservationsController.getReservationById);
 app.delete("/reservations/:id", authenticateToken, reservationsController.deleteReservation);
+app.put("/reservations/:id", authenticateToken, reservationsController.updateReservation);
 
 app.listen(PORT, () => {
   console.log(`API en ecoute sur http://localhost:${PORT}`);

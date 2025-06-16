@@ -1,4 +1,8 @@
-const { createReservationSchema } = require('../validators/reservationValidator');
+const {
+  createReservationSchema,
+  updateReservationSchema
+} = require('../validators/reservationValidator');
+
 const dayjs = require('dayjs');
 require('dayjs/locale/fr');
 dayjs.locale('fr');
@@ -97,6 +101,35 @@ const getReservationById = async (req, res) => {
   }
 };
 
+// Mettre à jour une réservation
+const updateReservation = async (req, res) => {
+  const { id } = req.params;
+  const eleve_id = req.user.id;
+  const updates = req.body;
+
+  const { error: validationError } = updateReservationSchema.validate(updates);
+  if (validationError) {
+    return res.status(400).json({ error: "Données invalides", details: validationError.details });
+  }
+
+  try {
+    const { data, error } = await req.supabase
+      .from('reservations')
+      .update(updates)
+      .eq('id', id)
+      .eq('eleve_id', eleve_id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: "Réservation introuvable" });
+
+    res.json({ success: true, reservation: data });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur mise à jour réservation", details: e.message });
+  }
+};
+
 // Supprimer une réservation
 const deleteReservation = async (req, res) => {
   const { id } = req.params;
@@ -120,5 +153,6 @@ module.exports = {
   createReservation,
   getReservations,
   getReservationById,
+  updateReservation,
   deleteReservation
 };

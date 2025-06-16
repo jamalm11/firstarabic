@@ -2,20 +2,18 @@
 
 echo "📋 Test complet des opérations sur les réservations"
 
-# --- Variables à adapter ---
-BASE_URL="http://localhost:3001"
-TOKEN="eyJhbGciOiJIUzI1NiIsImtpZCI6ImpSLzEyeTNFME5kelZvRnQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2Flcmh2eGZ6enB2ZXlra2VkbWVqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjYmM1MzBhNy0wYjJjLTRhYTgtOWVjNC00Y2FlMzQ0OWMzNzAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUwMDU4OTk3LCJpYXQiOjE3NTAwNTUzOTcsImVtYWlsIjoiamFtYWwubWFyb3VhbmVAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NTAwNTUzOTd9XSwic2Vzc2lvbl9pZCI6IjI4NTNmNjllLTBhOWItNGI1NS1iNWQ4LWRkZTYxZmM2NmFkZiIsImlzX2Fub255bW91cyI6ZmFsc2V9.L1OjYFE7U1fwmv2g4LYG1T09zq-59akbgVXSYRRXWuI"  # Remplace par un vrai token JWT
+# Authentification et infos
+TOKEN="eyJhbGciOiJIUzI1NiIsImtpZCI6ImpSLzEyeTNFME5kelZvRnQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2Flcmh2eGZ6enB2ZXlra2VkbWVqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjYmM1MzBhNy0wYjJjLTRhYTgtOWVjNC00Y2FlMzQ0OWMzNzAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUwMDY2MzM5LCJpYXQiOjE3NTAwNjI3MzksImVtYWlsIjoiamFtYWwubWFyb3VhbmVAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NTAwNjI3Mzl9XSwic2Vzc2lvbl9pZCI6ImExOTMyNzJlLTU3YjUtNDk2Mi05YzVjLTlkZDMyNWE2ZjM2ZSIsImlzX2Fub255bW91cyI6ZmFsc2V9.MDzaK0Tper4429mAFw4M-tJaqdf-uVOjT9mY0PSjLvU"
 PROF_ID="dca55991-7463-4035-b8a6-3173450f8528"
-DATE="2025-06-18"  # mercredi (doit correspondre à une dispo réelle du prof)
-HEURE_DEBUT="15:00"
-HEURE_FIN="15:30"
+DATE="2025-06-18"
+HEURE_DEBUT="14:00"
+HEURE_FIN="14:30"
 STATUT="en_attente"
-HEADERS=(-H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json")
 
-# --- Création ---
 echo "🔹 Création d'une réservation"
-CREATE_RESPONSE=$(curl -s -X POST "$BASE_URL/reservations" \
-  "${HEADERS[@]}" \
+CREATE_RESPONSE=$(curl -s -X POST http://localhost:3001/reservations \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
   -d "{
         \"prof_id\": \"$PROF_ID\",
         \"date\": \"$DATE\",
@@ -23,28 +21,44 @@ CREATE_RESPONSE=$(curl -s -X POST "$BASE_URL/reservations" \
         \"heure_fin\": \"$HEURE_FIN\",
         \"statut\": \"$STATUT\"
       }")
+
 echo "$CREATE_RESPONSE"
-RES_ID=$(echo "$CREATE_RESPONSE" | grep -o '"id":"[^"]*' | cut -d':' -f2 | tr -d '"')
 
-# --- Liste ---
-echo -e "\n🔹 Liste des réservations"
-curl -s -X GET "$BASE_URL/reservations" "${HEADERS[@]}" | jq .
+ID=$(echo "$CREATE_RESPONSE" | jq -r '.reservation.id')
 
-# --- Détail ---
-if [[ -n "$RES_ID" ]]; then
-  echo -e "\n🔹 Détail de la réservation créée (ID: $RES_ID)"
-  curl -s -X GET "$BASE_URL/reservations/$RES_ID" "${HEADERS[@]}" | jq .
-else
-  echo "❌ Aucun ID de réservation trouvé pour la récupération."
+if [ -z "$ID" ] || [ "$ID" == "null" ]; then
+  echo "❌ Échec lors de la création de la réservation ou réponse invalide"
+  echo "Réponse brute : $CREATE_RESPONSE"
+  exit 1
 fi
 
-# --- Suppression ---
-if [[ -n "$RES_ID" ]]; then
-  echo -e "\n🔹 Suppression de la réservation"
-  curl -s -X DELETE "$BASE_URL/reservations/$RES_ID" "${HEADERS[@]}" | jq .
+echo ""
+echo "🔹 Liste des réservations"
+curl -s -X GET http://localhost:3001/reservations \
+  -H "Authorization: Bearer $TOKEN" | jq .
 
-  echo -e "\n🔹 Vérification de suppression"
-  curl -s -X GET "$BASE_URL/reservations/$RES_ID" "${HEADERS[@]}" | jq .
-else
-  echo "❌ Aucun ID de réservation trouvé pour suppression."
-fi
+echo ""
+echo "🔹 Détail de la réservation créée (ID: $ID)"
+curl -s -X GET http://localhost:3001/reservations/$ID \
+  -H "Authorization: Bearer $TOKEN" | jq .
+
+echo ""
+echo "🔹 Mise à jour de la réservation"
+curl -s -X PUT http://localhost:3001/reservations/$ID \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+        \"statut\": \"confirmee\",
+        \"heure_debut\": \"15:30\",
+        \"heure_fin\": \"16:00\"
+      }" | jq .
+
+echo ""
+echo "🔹 Suppression de la réservation"
+curl -s -X DELETE http://localhost:3001/reservations/$ID \
+  -H "Authorization: Bearer $TOKEN" | jq .
+
+echo ""
+echo "🔹 Vérification de suppression"
+curl -s -X GET http://localhost:3001/reservations/$ID \
+  -H "Authorization: Bearer $TOKEN" | jq .
