@@ -1,13 +1,14 @@
+const paiementController = require('./controllers/paiementController');
 const reservationsController = require('./controllers/reservationsController');
 require('dotenv').config();
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const Joi = require('joi');
 const { eleveSchema } = require('./validators/eleveValidator');
-
 const app = express();
 const PORT = 3001;
 
+app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementController.handleStripeWebhook);
 app.use(express.json());
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -322,6 +323,9 @@ app.get("/reservations", authenticateToken, reservationsController.getReservatio
 app.get("/reservations/:id", authenticateToken, reservationsController.getReservationById);
 app.delete("/reservations/:id", authenticateToken, reservationsController.deleteReservation);
 app.put("/reservations/:id", authenticateToken, reservationsController.updateReservation);
+
+// index.js
+//app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementController.handleStripeWebhook);
 
 app.listen(PORT, () => {
   console.log(`API en ecoute sur http://localhost:${PORT}`);
