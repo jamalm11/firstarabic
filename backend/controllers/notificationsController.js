@@ -57,6 +57,10 @@ const markAsRead = async (req, res) => {
     return res.status(500).json({ error: "Erreur mise à jour notification", details: error.message });
   }
 
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: "Notification non trouvée" });
+  }
+
   res.json({ success: true, notification: data[0] });
 };
 
@@ -65,14 +69,19 @@ const deleteNotification = async (req, res) => {
   const { id } = req.params;
   const { id: user_id } = req.user;
 
-  const { error } = await req.supabase
+  const { data, error } = await req.supabase
     .from('notifications')
     .delete()
     .eq('id', id)
-    .eq('user_id', user_id);
+    .eq('user_id', user_id)
+    .select();
 
   if (error) {
     return res.status(500).json({ error: "Erreur suppression notification", details: error.message });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: "Notification non trouvée" });
   }
 
   res.json({ success: true, message: "Notification supprimée" });
