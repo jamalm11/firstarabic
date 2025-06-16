@@ -1,4 +1,4 @@
-
+const reservationsController = require('./controllers/reservationsController');
 require('dotenv').config();
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
@@ -316,6 +316,11 @@ app.put("/disponibilites/:id", authenticateToken, disponibilitesController.updat
 app.delete("/disponibilites/:id", authenticateToken, disponibilitesController.deleteDisponibilite);
 app.patch("/disponibilites/:id", authenticateToken, disponibilitesController.updateDisponibilite);
 
+// reservations
+app.post("/reservations", authenticateToken, reservationsController.createReservation);
+app.get("/reservations", authenticateToken, reservationsController.getReservations);
+app.get("/reservations/:id", authenticateToken, reservationsController.getReservationById);
+app.delete("/reservations/:id", authenticateToken, reservationsController.deleteReservation);
 
 app.listen(PORT, () => {
   console.log(`API en ecoute sur http://localhost:${PORT}`);

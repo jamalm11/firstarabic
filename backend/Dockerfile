@@ -13,7 +13,7 @@ COPY package*.json ./
 RUN npm install dotenv && \
     npm ci --ignore-scripts && \
     npm cache clean --force
-
+RUN npm install dayjs
 # Étape d'exécution
 FROM node:20-alpine
 
