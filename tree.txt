@@ -1,0 +1,2482 @@
+/Users/sarahandouf/x/firstarabic
+.
+├── README.md
+├── READMEv1.md
+├── backend
+│   ├── Dockerfile
+│   ├── DockerfileN
+│   ├── add_eleve.js
+│   ├── add_prof.js
+│   ├── controllers
+│   │   ├── abonnementController.js
+│   │   ├── coursController.js
+│   │   ├── disponibilitesController.js
+│   │   ├── notificationsController.js
+│   │   ├── paiementController.js
+│   │   └── reservationsController.js
+│   ├── index.js
+│   ├── index.js.back
+│   ├── login.js
+│   ├── migrations
+│   │   ├── 001_create_notifications.sql
+│   │   ├── 002_create_eleves.sql
+│   │   ├── 003_create_profs.sql
+│   │   ├── 004_create_cours.sql
+│   │   ├── 005_create_disponibilites.sql
+│   │   └── README.txt
+│   ├── node_modules
+│   │   ├── @hapi
+│   │   │   ├── hoek
+│   │   │   │   ├── LICENSE.md
+│   │   │   │   ├── README.md
+│   │   │   │   ├── lib
+│   │   │   │   │   ├── applyToDefaults.js
+│   │   │   │   │   ├── assert.js
+│   │   │   │   │   ├── bench.js
+│   │   │   │   │   ├── block.js
+│   │   │   │   │   ├── clone.js
+│   │   │   │   │   ├── contain.js
+│   │   │   │   │   ├── deepEqual.js
+│   │   │   │   │   ├── error.js
+│   │   │   │   │   ├── escapeHeaderAttribute.js
+│   │   │   │   │   ├── escapeHtml.js
+│   │   │   │   │   ├── escapeJson.js
+│   │   │   │   │   ├── escapeRegex.js
+│   │   │   │   │   ├── flatten.js
+│   │   │   │   │   ├── ignore.js
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── intersect.js
+│   │   │   │   │   ├── isPromise.js
+│   │   │   │   │   ├── merge.js
+│   │   │   │   │   ├── once.js
+│   │   │   │   │   ├── reach.js
+│   │   │   │   │   ├── reachTemplate.js
+│   │   │   │   │   ├── stringify.js
+│   │   │   │   │   ├── types.js
+│   │   │   │   │   ├── utils.js
+│   │   │   │   │   └── wait.js
+│   │   │   │   └── package.json
+│   │   │   └── topo
+│   │   │       ├── LICENSE.md
+│   │   │       ├── README.md
+│   │   │       ├── lib
+│   │   │       │   ├── index.d.ts
+│   │   │       │   └── index.js
+│   │   │       └── package.json
+│   │   ├── @sideway
+│   │   │   ├── address
+│   │   │   │   ├── LICENSE.md
+│   │   │   │   ├── README.md
+│   │   │   │   ├── lib
+│   │   │   │   │   ├── decode.js
+│   │   │   │   │   ├── domain.js
+│   │   │   │   │   ├── email.js
+│   │   │   │   │   ├── errors.js
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── ip.js
+│   │   │   │   │   ├── tlds.js
+│   │   │   │   │   └── uri.js
+│   │   │   │   └── package.json
+│   │   │   ├── formula
+│   │   │   │   ├── LICENSE.md
+│   │   │   │   ├── README.md
+│   │   │   │   ├── lib
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   └── index.js
+│   │   │   │   └── package.json
+│   │   │   └── pinpoint
+│   │   │       ├── LICENSE.md
+│   │   │       ├── README.md
+│   │   │       ├── lib
+│   │   │       │   ├── index.d.ts
+│   │   │       │   └── index.js
+│   │   │       └── package.json
+│   │   ├── @supabase
+│   │   │   ├── auth-js
+│   │   │   │   ├── LICENSE
+│   │   │   │   ├── README.md
+│   │   │   │   ├── dist
+│   │   │   │   │   ├── main
+│   │   │   │   │   │   ├── AuthAdminApi.d.ts
+│   │   │   │   │   │   ├── AuthAdminApi.d.ts.map
+│   │   │   │   │   │   ├── AuthAdminApi.js
+│   │   │   │   │   │   ├── AuthAdminApi.js.map
+│   │   │   │   │   │   ├── AuthClient.d.ts
+│   │   │   │   │   │   ├── AuthClient.d.ts.map
+│   │   │   │   │   │   ├── AuthClient.js
+│   │   │   │   │   │   ├── AuthClient.js.map
+│   │   │   │   │   │   ├── GoTrueAdminApi.d.ts
+│   │   │   │   │   │   ├── GoTrueAdminApi.d.ts.map
+│   │   │   │   │   │   ├── GoTrueAdminApi.js
+│   │   │   │   │   │   ├── GoTrueAdminApi.js.map
+│   │   │   │   │   │   ├── GoTrueClient.d.ts
+│   │   │   │   │   │   ├── GoTrueClient.d.ts.map
+│   │   │   │   │   │   ├── GoTrueClient.js
+│   │   │   │   │   │   ├── GoTrueClient.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   └── lib
+│   │   │   │   │   │       ├── base64url.d.ts
+│   │   │   │   │   │       ├── base64url.d.ts.map
+│   │   │   │   │   │       ├── base64url.js
+│   │   │   │   │   │       ├── base64url.js.map
+│   │   │   │   │   │       ├── constants.d.ts
+│   │   │   │   │   │       ├── constants.d.ts.map
+│   │   │   │   │   │       ├── constants.js
+│   │   │   │   │   │       ├── constants.js.map
+│   │   │   │   │   │       ├── error-codes.d.ts
+│   │   │   │   │   │       ├── error-codes.d.ts.map
+│   │   │   │   │   │       ├── error-codes.js
+│   │   │   │   │   │       ├── error-codes.js.map
+│   │   │   │   │   │       ├── errors.d.ts
+│   │   │   │   │   │       ├── errors.d.ts.map
+│   │   │   │   │   │       ├── errors.js
+│   │   │   │   │   │       ├── errors.js.map
+│   │   │   │   │   │       ├── fetch.d.ts
+│   │   │   │   │   │       ├── fetch.d.ts.map
+│   │   │   │   │   │       ├── fetch.js
+│   │   │   │   │   │       ├── fetch.js.map
+│   │   │   │   │   │       ├── helpers.d.ts
+│   │   │   │   │   │       ├── helpers.d.ts.map
+│   │   │   │   │   │       ├── helpers.js
+│   │   │   │   │   │       ├── helpers.js.map
+│   │   │   │   │   │       ├── local-storage.d.ts
+│   │   │   │   │   │       ├── local-storage.d.ts.map
+│   │   │   │   │   │       ├── local-storage.js
+│   │   │   │   │   │       ├── local-storage.js.map
+│   │   │   │   │   │       ├── locks.d.ts
+│   │   │   │   │   │       ├── locks.d.ts.map
+│   │   │   │   │   │       ├── locks.js
+│   │   │   │   │   │       ├── locks.js.map
+│   │   │   │   │   │       ├── polyfills.d.ts
+│   │   │   │   │   │       ├── polyfills.d.ts.map
+│   │   │   │   │   │       ├── polyfills.js
+│   │   │   │   │   │       ├── polyfills.js.map
+│   │   │   │   │   │       ├── types.d.ts
+│   │   │   │   │   │       ├── types.d.ts.map
+│   │   │   │   │   │       ├── types.js
+│   │   │   │   │   │       ├── types.js.map
+│   │   │   │   │   │       ├── version.d.ts
+│   │   │   │   │   │       ├── version.d.ts.map
+│   │   │   │   │   │       ├── version.js
+│   │   │   │   │   │       └── version.js.map
+│   │   │   │   │   └── module
+│   │   │   │   │       ├── AuthAdminApi.d.ts
+│   │   │   │   │       ├── AuthAdminApi.d.ts.map
+│   │   │   │   │       ├── AuthAdminApi.js
+│   │   │   │   │       ├── AuthAdminApi.js.map
+│   │   │   │   │       ├── AuthClient.d.ts
+│   │   │   │   │       ├── AuthClient.d.ts.map
+│   │   │   │   │       ├── AuthClient.js
+│   │   │   │   │       ├── AuthClient.js.map
+│   │   │   │   │       ├── GoTrueAdminApi.d.ts
+│   │   │   │   │       ├── GoTrueAdminApi.d.ts.map
+│   │   │   │   │       ├── GoTrueAdminApi.js
+│   │   │   │   │       ├── GoTrueAdminApi.js.map
+│   │   │   │   │       ├── GoTrueClient.d.ts
+│   │   │   │   │       ├── GoTrueClient.d.ts.map
+│   │   │   │   │       ├── GoTrueClient.js
+│   │   │   │   │       ├── GoTrueClient.js.map
+│   │   │   │   │       ├── index.d.ts
+│   │   │   │   │       ├── index.d.ts.map
+│   │   │   │   │       ├── index.js
+│   │   │   │   │       ├── index.js.map
+│   │   │   │   │       └── lib
+│   │   │   │   │           ├── base64url.d.ts
+│   │   │   │   │           ├── base64url.d.ts.map
+│   │   │   │   │           ├── base64url.js
+│   │   │   │   │           ├── base64url.js.map
+│   │   │   │   │           ├── constants.d.ts
+│   │   │   │   │           ├── constants.d.ts.map
+│   │   │   │   │           ├── constants.js
+│   │   │   │   │           ├── constants.js.map
+│   │   │   │   │           ├── error-codes.d.ts
+│   │   │   │   │           ├── error-codes.d.ts.map
+│   │   │   │   │           ├── error-codes.js
+│   │   │   │   │           ├── error-codes.js.map
+│   │   │   │   │           ├── errors.d.ts
+│   │   │   │   │           ├── errors.d.ts.map
+│   │   │   │   │           ├── errors.js
+│   │   │   │   │           ├── errors.js.map
+│   │   │   │   │           ├── fetch.d.ts
+│   │   │   │   │           ├── fetch.d.ts.map
+│   │   │   │   │           ├── fetch.js
+│   │   │   │   │           ├── fetch.js.map
+│   │   │   │   │           ├── helpers.d.ts
+│   │   │   │   │           ├── helpers.d.ts.map
+│   │   │   │   │           ├── helpers.js
+│   │   │   │   │           ├── helpers.js.map
+│   │   │   │   │           ├── local-storage.d.ts
+│   │   │   │   │           ├── local-storage.d.ts.map
+│   │   │   │   │           ├── local-storage.js
+│   │   │   │   │           ├── local-storage.js.map
+│   │   │   │   │           ├── locks.d.ts
+│   │   │   │   │           ├── locks.d.ts.map
+│   │   │   │   │           ├── locks.js
+│   │   │   │   │           ├── locks.js.map
+│   │   │   │   │           ├── polyfills.d.ts
+│   │   │   │   │           ├── polyfills.d.ts.map
+│   │   │   │   │           ├── polyfills.js
+│   │   │   │   │           ├── polyfills.js.map
+│   │   │   │   │           ├── types.d.ts
+│   │   │   │   │           ├── types.d.ts.map
+│   │   │   │   │           ├── types.js
+│   │   │   │   │           ├── types.js.map
+│   │   │   │   │           ├── version.d.ts
+│   │   │   │   │           ├── version.d.ts.map
+│   │   │   │   │           ├── version.js
+│   │   │   │   │           └── version.js.map
+│   │   │   │   ├── package.json
+│   │   │   │   └── src
+│   │   │   │       ├── AuthAdminApi.ts
+│   │   │   │       ├── AuthClient.ts
+│   │   │   │       ├── GoTrueAdminApi.ts
+│   │   │   │       ├── GoTrueClient.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       └── lib
+│   │   │   │           ├── base64url.ts
+│   │   │   │           ├── constants.ts
+│   │   │   │           ├── error-codes.ts
+│   │   │   │           ├── errors.ts
+│   │   │   │           ├── fetch.ts
+│   │   │   │           ├── helpers.ts
+│   │   │   │           ├── local-storage.ts
+│   │   │   │           ├── locks.ts
+│   │   │   │           ├── polyfills.ts
+│   │   │   │           ├── types.ts
+│   │   │   │           └── version.ts
+│   │   │   ├── functions-js
+│   │   │   │   ├── LICENSE
+│   │   │   │   ├── README.md
+│   │   │   │   ├── dist
+│   │   │   │   │   ├── main
+│   │   │   │   │   │   ├── FunctionsClient.d.ts
+│   │   │   │   │   │   ├── FunctionsClient.d.ts.map
+│   │   │   │   │   │   ├── FunctionsClient.js
+│   │   │   │   │   │   ├── FunctionsClient.js.map
+│   │   │   │   │   │   ├── helper.d.ts
+│   │   │   │   │   │   ├── helper.d.ts.map
+│   │   │   │   │   │   ├── helper.js
+│   │   │   │   │   │   ├── helper.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   │   ├── version.js
+│   │   │   │   │   │   └── version.js.map
+│   │   │   │   │   └── module
+│   │   │   │   │       ├── FunctionsClient.d.ts
+│   │   │   │   │       ├── FunctionsClient.d.ts.map
+│   │   │   │   │       ├── FunctionsClient.js
+│   │   │   │   │       ├── FunctionsClient.js.map
+│   │   │   │   │       ├── helper.d.ts
+│   │   │   │   │       ├── helper.d.ts.map
+│   │   │   │   │       ├── helper.js
+│   │   │   │   │       ├── helper.js.map
+│   │   │   │   │       ├── index.d.ts
+│   │   │   │   │       ├── index.d.ts.map
+│   │   │   │   │       ├── index.js
+│   │   │   │   │       ├── index.js.map
+│   │   │   │   │       ├── types.d.ts
+│   │   │   │   │       ├── types.d.ts.map
+│   │   │   │   │       ├── types.js
+│   │   │   │   │       ├── types.js.map
+│   │   │   │   │       ├── version.d.ts
+│   │   │   │   │       ├── version.d.ts.map
+│   │   │   │   │       ├── version.js
+│   │   │   │   │       └── version.js.map
+│   │   │   │   ├── package.json
+│   │   │   │   └── src
+│   │   │   │       ├── FunctionsClient.ts
+│   │   │   │       ├── edge-runtime.d.ts
+│   │   │   │       ├── helper.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       ├── types.ts
+│   │   │   │       └── version.ts
+│   │   │   ├── node-fetch
+│   │   │   │   ├── LICENSE.md
+│   │   │   │   ├── README.md
+│   │   │   │   ├── browser.js
+│   │   │   │   ├── lib
+│   │   │   │   │   ├── index.es.js
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   └── index.mjs
+│   │   │   │   └── package.json
+│   │   │   ├── postgrest-js
+│   │   │   │   ├── LICENSE
+│   │   │   │   ├── README.md
+│   │   │   │   ├── dist
+│   │   │   │   │   ├── cjs
+│   │   │   │   │   │   ├── PostgrestBuilder.d.ts
+│   │   │   │   │   │   ├── PostgrestBuilder.d.ts.map
+│   │   │   │   │   │   ├── PostgrestBuilder.js
+│   │   │   │   │   │   ├── PostgrestBuilder.js.map
+│   │   │   │   │   │   ├── PostgrestClient.d.ts
+│   │   │   │   │   │   ├── PostgrestClient.d.ts.map
+│   │   │   │   │   │   ├── PostgrestClient.js
+│   │   │   │   │   │   ├── PostgrestClient.js.map
+│   │   │   │   │   │   ├── PostgrestError.d.ts
+│   │   │   │   │   │   ├── PostgrestError.d.ts.map
+│   │   │   │   │   │   ├── PostgrestError.js
+│   │   │   │   │   │   ├── PostgrestError.js.map
+│   │   │   │   │   │   ├── PostgrestFilterBuilder.d.ts
+│   │   │   │   │   │   ├── PostgrestFilterBuilder.d.ts.map
+│   │   │   │   │   │   ├── PostgrestFilterBuilder.js
+│   │   │   │   │   │   ├── PostgrestFilterBuilder.js.map
+│   │   │   │   │   │   ├── PostgrestQueryBuilder.d.ts
+│   │   │   │   │   │   ├── PostgrestQueryBuilder.d.ts.map
+│   │   │   │   │   │   ├── PostgrestQueryBuilder.js
+│   │   │   │   │   │   ├── PostgrestQueryBuilder.js.map
+│   │   │   │   │   │   ├── PostgrestTransformBuilder.d.ts
+│   │   │   │   │   │   ├── PostgrestTransformBuilder.d.ts.map
+│   │   │   │   │   │   ├── PostgrestTransformBuilder.js
+│   │   │   │   │   │   ├── PostgrestTransformBuilder.js.map
+│   │   │   │   │   │   ├── constants.d.ts
+│   │   │   │   │   │   ├── constants.d.ts.map
+│   │   │   │   │   │   ├── constants.js
+│   │   │   │   │   │   ├── constants.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   ├── select-query-parser
+│   │   │   │   │   │   │   ├── parser.d.ts
+│   │   │   │   │   │   │   ├── parser.d.ts.map
+│   │   │   │   │   │   │   ├── parser.js
+│   │   │   │   │   │   │   ├── parser.js.map
+│   │   │   │   │   │   │   ├── result.d.ts
+│   │   │   │   │   │   │   ├── result.d.ts.map
+│   │   │   │   │   │   │   ├── result.js
+│   │   │   │   │   │   │   ├── result.js.map
+│   │   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   │   ├── utils.d.ts
+│   │   │   │   │   │   │   ├── utils.d.ts.map
+│   │   │   │   │   │   │   ├── utils.js
+│   │   │   │   │   │   │   └── utils.js.map
+│   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   │   ├── version.js
+│   │   │   │   │   │   └── version.js.map
+│   │   │   │   │   └── esm
+│   │   │   │   │       └── wrapper.mjs
+│   │   │   │   ├── package.json
+│   │   │   │   └── src
+│   │   │   │       ├── PostgrestBuilder.ts
+│   │   │   │       ├── PostgrestClient.ts
+│   │   │   │       ├── PostgrestError.ts
+│   │   │   │       ├── PostgrestFilterBuilder.ts
+│   │   │   │       ├── PostgrestQueryBuilder.ts
+│   │   │   │       ├── PostgrestTransformBuilder.ts
+│   │   │   │       ├── constants.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       ├── select-query-parser
+│   │   │   │       │   ├── parser.ts
+│   │   │   │       │   ├── result.ts
+│   │   │   │       │   ├── types.ts
+│   │   │   │       │   └── utils.ts
+│   │   │   │       ├── types.ts
+│   │   │   │       └── version.ts
+│   │   │   ├── realtime-js
+│   │   │   │   ├── LICENSE.md
+│   │   │   │   ├── README.md
+│   │   │   │   ├── dist
+│   │   │   │   │   ├── main
+│   │   │   │   │   │   ├── RealtimeChannel.d.ts
+│   │   │   │   │   │   ├── RealtimeChannel.d.ts.map
+│   │   │   │   │   │   ├── RealtimeChannel.js
+│   │   │   │   │   │   ├── RealtimeChannel.js.map
+│   │   │   │   │   │   ├── RealtimeClient.d.ts
+│   │   │   │   │   │   ├── RealtimeClient.d.ts.map
+│   │   │   │   │   │   ├── RealtimeClient.js
+│   │   │   │   │   │   ├── RealtimeClient.js.map
+│   │   │   │   │   │   ├── RealtimePresence.d.ts
+│   │   │   │   │   │   ├── RealtimePresence.d.ts.map
+│   │   │   │   │   │   ├── RealtimePresence.js
+│   │   │   │   │   │   ├── RealtimePresence.js.map
+│   │   │   │   │   │   ├── WebSocket.browser.d.ts
+│   │   │   │   │   │   ├── WebSocket.browser.d.ts.map
+│   │   │   │   │   │   ├── WebSocket.browser.js
+│   │   │   │   │   │   ├── WebSocket.browser.js.map
+│   │   │   │   │   │   ├── WebSocket.d.ts
+│   │   │   │   │   │   ├── WebSocket.d.ts.map
+│   │   │   │   │   │   ├── WebSocket.js
+│   │   │   │   │   │   ├── WebSocket.js.map
+│   │   │   │   │   │   ├── WebSocket.native.d.ts
+│   │   │   │   │   │   ├── WebSocket.native.d.ts.map
+│   │   │   │   │   │   ├── WebSocket.native.js
+│   │   │   │   │   │   ├── WebSocket.native.js.map
+│   │   │   │   │   │   ├── WebSocket.node.d.ts
+│   │   │   │   │   │   ├── WebSocket.node.d.ts.map
+│   │   │   │   │   │   ├── WebSocket.node.js
+│   │   │   │   │   │   ├── WebSocket.node.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   └── lib
+│   │   │   │   │   │       ├── constants.d.ts
+│   │   │   │   │   │       ├── constants.d.ts.map
+│   │   │   │   │   │       ├── constants.js
+│   │   │   │   │   │       ├── constants.js.map
+│   │   │   │   │   │       ├── push.d.ts
+│   │   │   │   │   │       ├── push.d.ts.map
+│   │   │   │   │   │       ├── push.js
+│   │   │   │   │   │       ├── push.js.map
+│   │   │   │   │   │       ├── serializer.d.ts
+│   │   │   │   │   │       ├── serializer.d.ts.map
+│   │   │   │   │   │       ├── serializer.js
+│   │   │   │   │   │       ├── serializer.js.map
+│   │   │   │   │   │       ├── timer.d.ts
+│   │   │   │   │   │       ├── timer.d.ts.map
+│   │   │   │   │   │       ├── timer.js
+│   │   │   │   │   │       ├── timer.js.map
+│   │   │   │   │   │       ├── transformers.d.ts
+│   │   │   │   │   │       ├── transformers.d.ts.map
+│   │   │   │   │   │       ├── transformers.js
+│   │   │   │   │   │       ├── transformers.js.map
+│   │   │   │   │   │       ├── version.d.ts
+│   │   │   │   │   │       ├── version.d.ts.map
+│   │   │   │   │   │       ├── version.js
+│   │   │   │   │   │       └── version.js.map
+│   │   │   │   │   └── module
+│   │   │   │   │       ├── RealtimeChannel.d.ts
+│   │   │   │   │       ├── RealtimeChannel.d.ts.map
+│   │   │   │   │       ├── RealtimeChannel.js
+│   │   │   │   │       ├── RealtimeChannel.js.map
+│   │   │   │   │       ├── RealtimeClient.d.ts
+│   │   │   │   │       ├── RealtimeClient.d.ts.map
+│   │   │   │   │       ├── RealtimeClient.js
+│   │   │   │   │       ├── RealtimeClient.js.map
+│   │   │   │   │       ├── RealtimePresence.d.ts
+│   │   │   │   │       ├── RealtimePresence.d.ts.map
+│   │   │   │   │       ├── RealtimePresence.js
+│   │   │   │   │       ├── RealtimePresence.js.map
+│   │   │   │   │       ├── WebSocket.browser.d.ts
+│   │   │   │   │       ├── WebSocket.browser.d.ts.map
+│   │   │   │   │       ├── WebSocket.browser.js
+│   │   │   │   │       ├── WebSocket.browser.js.map
+│   │   │   │   │       ├── WebSocket.d.ts
+│   │   │   │   │       ├── WebSocket.d.ts.map
+│   │   │   │   │       ├── WebSocket.js
+│   │   │   │   │       ├── WebSocket.js.map
+│   │   │   │   │       ├── WebSocket.native.d.ts
+│   │   │   │   │       ├── WebSocket.native.d.ts.map
+│   │   │   │   │       ├── WebSocket.native.js
+│   │   │   │   │       ├── WebSocket.native.js.map
+│   │   │   │   │       ├── WebSocket.node.d.ts
+│   │   │   │   │       ├── WebSocket.node.d.ts.map
+│   │   │   │   │       ├── WebSocket.node.js
+│   │   │   │   │       ├── WebSocket.node.js.map
+│   │   │   │   │       ├── index.d.ts
+│   │   │   │   │       ├── index.d.ts.map
+│   │   │   │   │       ├── index.js
+│   │   │   │   │       ├── index.js.map
+│   │   │   │   │       └── lib
+│   │   │   │   │           ├── constants.d.ts
+│   │   │   │   │           ├── constants.d.ts.map
+│   │   │   │   │           ├── constants.js
+│   │   │   │   │           ├── constants.js.map
+│   │   │   │   │           ├── push.d.ts
+│   │   │   │   │           ├── push.d.ts.map
+│   │   │   │   │           ├── push.js
+│   │   │   │   │           ├── push.js.map
+│   │   │   │   │           ├── serializer.d.ts
+│   │   │   │   │           ├── serializer.d.ts.map
+│   │   │   │   │           ├── serializer.js
+│   │   │   │   │           ├── serializer.js.map
+│   │   │   │   │           ├── timer.d.ts
+│   │   │   │   │           ├── timer.d.ts.map
+│   │   │   │   │           ├── timer.js
+│   │   │   │   │           ├── timer.js.map
+│   │   │   │   │           ├── transformers.d.ts
+│   │   │   │   │           ├── transformers.d.ts.map
+│   │   │   │   │           ├── transformers.js
+│   │   │   │   │           ├── transformers.js.map
+│   │   │   │   │           ├── version.d.ts
+│   │   │   │   │           ├── version.d.ts.map
+│   │   │   │   │           ├── version.js
+│   │   │   │   │           └── version.js.map
+│   │   │   │   ├── package.json
+│   │   │   │   └── src
+│   │   │   │       ├── RealtimeChannel.ts
+│   │   │   │       ├── RealtimeClient.ts
+│   │   │   │       ├── RealtimePresence.ts
+│   │   │   │       ├── WebSocket.browser.ts
+│   │   │   │       ├── WebSocket.native.ts
+│   │   │   │       ├── WebSocket.node.ts
+│   │   │   │       ├── WebSocket.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       └── lib
+│   │   │   │           ├── constants.ts
+│   │   │   │           ├── push.ts
+│   │   │   │           ├── serializer.ts
+│   │   │   │           ├── timer.ts
+│   │   │   │           ├── transformers.ts
+│   │   │   │           └── version.ts
+│   │   │   ├── storage-js
+│   │   │   │   ├── LICENSE
+│   │   │   │   ├── README.md
+│   │   │   │   ├── dist
+│   │   │   │   │   ├── main
+│   │   │   │   │   │   ├── StorageClient.d.ts
+│   │   │   │   │   │   ├── StorageClient.d.ts.map
+│   │   │   │   │   │   ├── StorageClient.js
+│   │   │   │   │   │   ├── StorageClient.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   ├── lib
+│   │   │   │   │   │   │   ├── constants.d.ts
+│   │   │   │   │   │   │   ├── constants.d.ts.map
+│   │   │   │   │   │   │   ├── constants.js
+│   │   │   │   │   │   │   ├── constants.js.map
+│   │   │   │   │   │   │   ├── errors.d.ts
+│   │   │   │   │   │   │   ├── errors.d.ts.map
+│   │   │   │   │   │   │   ├── errors.js
+│   │   │   │   │   │   │   ├── errors.js.map
+│   │   │   │   │   │   │   ├── fetch.d.ts
+│   │   │   │   │   │   │   ├── fetch.d.ts.map
+│   │   │   │   │   │   │   ├── fetch.js
+│   │   │   │   │   │   │   ├── fetch.js.map
+│   │   │   │   │   │   │   ├── helpers.d.ts
+│   │   │   │   │   │   │   ├── helpers.d.ts.map
+│   │   │   │   │   │   │   ├── helpers.js
+│   │   │   │   │   │   │   ├── helpers.js.map
+│   │   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   │   │   ├── version.js
+│   │   │   │   │   │   │   └── version.js.map
+│   │   │   │   │   │   └── packages
+│   │   │   │   │   │       ├── StorageBucketApi.d.ts
+│   │   │   │   │   │       ├── StorageBucketApi.d.ts.map
+│   │   │   │   │   │       ├── StorageBucketApi.js
+│   │   │   │   │   │       ├── StorageBucketApi.js.map
+│   │   │   │   │   │       ├── StorageFileApi.d.ts
+│   │   │   │   │   │       ├── StorageFileApi.d.ts.map
+│   │   │   │   │   │       ├── StorageFileApi.js
+│   │   │   │   │   │       └── StorageFileApi.js.map
+│   │   │   │   │   ├── module
+│   │   │   │   │   │   ├── StorageClient.d.ts
+│   │   │   │   │   │   ├── StorageClient.d.ts.map
+│   │   │   │   │   │   ├── StorageClient.js
+│   │   │   │   │   │   ├── StorageClient.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   ├── lib
+│   │   │   │   │   │   │   ├── constants.d.ts
+│   │   │   │   │   │   │   ├── constants.d.ts.map
+│   │   │   │   │   │   │   ├── constants.js
+│   │   │   │   │   │   │   ├── constants.js.map
+│   │   │   │   │   │   │   ├── errors.d.ts
+│   │   │   │   │   │   │   ├── errors.d.ts.map
+│   │   │   │   │   │   │   ├── errors.js
+│   │   │   │   │   │   │   ├── errors.js.map
+│   │   │   │   │   │   │   ├── fetch.d.ts
+│   │   │   │   │   │   │   ├── fetch.d.ts.map
+│   │   │   │   │   │   │   ├── fetch.js
+│   │   │   │   │   │   │   ├── fetch.js.map
+│   │   │   │   │   │   │   ├── helpers.d.ts
+│   │   │   │   │   │   │   ├── helpers.d.ts.map
+│   │   │   │   │   │   │   ├── helpers.js
+│   │   │   │   │   │   │   ├── helpers.js.map
+│   │   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   │   │   ├── version.js
+│   │   │   │   │   │   │   └── version.js.map
+│   │   │   │   │   │   └── packages
+│   │   │   │   │   │       ├── StorageBucketApi.d.ts
+│   │   │   │   │   │       ├── StorageBucketApi.d.ts.map
+│   │   │   │   │   │       ├── StorageBucketApi.js
+│   │   │   │   │   │       ├── StorageBucketApi.js.map
+│   │   │   │   │   │       ├── StorageFileApi.d.ts
+│   │   │   │   │   │       ├── StorageFileApi.d.ts.map
+│   │   │   │   │   │       ├── StorageFileApi.js
+│   │   │   │   │   │       └── StorageFileApi.js.map
+│   │   │   │   │   └── umd
+│   │   │   │   │       └── supabase.js
+│   │   │   │   ├── package.json
+│   │   │   │   └── src
+│   │   │   │       ├── StorageClient.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       ├── lib
+│   │   │   │       │   ├── constants.ts
+│   │   │   │       │   ├── errors.ts
+│   │   │   │       │   ├── fetch.ts
+│   │   │   │       │   ├── helpers.ts
+│   │   │   │       │   ├── index.ts
+│   │   │   │       │   ├── types.ts
+│   │   │   │       │   └── version.ts
+│   │   │   │       └── packages
+│   │   │   │           ├── StorageBucketApi.ts
+│   │   │   │           └── StorageFileApi.ts
+│   │   │   └── supabase-js
+│   │   │       ├── LICENSE
+│   │   │       ├── README.md
+│   │   │       ├── dist
+│   │   │       │   ├── main
+│   │   │       │   │   ├── SupabaseClient.d.ts
+│   │   │       │   │   ├── SupabaseClient.d.ts.map
+│   │   │       │   │   ├── SupabaseClient.js
+│   │   │       │   │   ├── SupabaseClient.js.map
+│   │   │       │   │   ├── index.d.ts
+│   │   │       │   │   ├── index.d.ts.map
+│   │   │       │   │   ├── index.js
+│   │   │       │   │   ├── index.js.map
+│   │   │       │   │   └── lib
+│   │   │       │   │       ├── SupabaseAuthClient.d.ts
+│   │   │       │   │       ├── SupabaseAuthClient.d.ts.map
+│   │   │       │   │       ├── SupabaseAuthClient.js
+│   │   │       │   │       ├── SupabaseAuthClient.js.map
+│   │   │       │   │       ├── constants.d.ts
+│   │   │       │   │       ├── constants.d.ts.map
+│   │   │       │   │       ├── constants.js
+│   │   │       │   │       ├── constants.js.map
+│   │   │       │   │       ├── fetch.d.ts
+│   │   │       │   │       ├── fetch.d.ts.map
+│   │   │       │   │       ├── fetch.js
+│   │   │       │   │       ├── fetch.js.map
+│   │   │       │   │       ├── helpers.d.ts
+│   │   │       │   │       ├── helpers.d.ts.map
+│   │   │       │   │       ├── helpers.js
+│   │   │       │   │       ├── helpers.js.map
+│   │   │       │   │       ├── types.d.ts
+│   │   │       │   │       ├── types.d.ts.map
+│   │   │       │   │       ├── types.js
+│   │   │       │   │       ├── types.js.map
+│   │   │       │   │       ├── version.d.ts
+│   │   │       │   │       ├── version.d.ts.map
+│   │   │       │   │       ├── version.js
+│   │   │       │   │       └── version.js.map
+│   │   │       │   ├── module
+│   │   │       │   │   ├── SupabaseClient.d.ts
+│   │   │       │   │   ├── SupabaseClient.d.ts.map
+│   │   │       │   │   ├── SupabaseClient.js
+│   │   │       │   │   ├── SupabaseClient.js.map
+│   │   │       │   │   ├── index.d.ts
+│   │   │       │   │   ├── index.d.ts.map
+│   │   │       │   │   ├── index.js
+│   │   │       │   │   ├── index.js.map
+│   │   │       │   │   └── lib
+│   │   │       │   │       ├── SupabaseAuthClient.d.ts
+│   │   │       │   │       ├── SupabaseAuthClient.d.ts.map
+│   │   │       │   │       ├── SupabaseAuthClient.js
+│   │   │       │   │       ├── SupabaseAuthClient.js.map
+│   │   │       │   │       ├── constants.d.ts
+│   │   │       │   │       ├── constants.d.ts.map
+│   │   │       │   │       ├── constants.js
+│   │   │       │   │       ├── constants.js.map
+│   │   │       │   │       ├── fetch.d.ts
+│   │   │       │   │       ├── fetch.d.ts.map
+│   │   │       │   │       ├── fetch.js
+│   │   │       │   │       ├── fetch.js.map
+│   │   │       │   │       ├── helpers.d.ts
+│   │   │       │   │       ├── helpers.d.ts.map
+│   │   │       │   │       ├── helpers.js
+│   │   │       │   │       ├── helpers.js.map
+│   │   │       │   │       ├── types.d.ts
+│   │   │       │   │       ├── types.d.ts.map
+│   │   │       │   │       ├── types.js
+│   │   │       │   │       ├── types.js.map
+│   │   │       │   │       ├── version.d.ts
+│   │   │       │   │       ├── version.d.ts.map
+│   │   │       │   │       ├── version.js
+│   │   │       │   │       └── version.js.map
+│   │   │       │   └── umd
+│   │   │       │       └── supabase.js
+│   │   │       ├── package.json
+│   │   │       └── src
+│   │   │           ├── SupabaseClient.ts
+│   │   │           ├── index.ts
+│   │   │           └── lib
+│   │   │               ├── SupabaseAuthClient.ts
+│   │   │               ├── constants.ts
+│   │   │               ├── fetch.ts
+│   │   │               ├── helpers.ts
+│   │   │               ├── types.ts
+│   │   │               └── version.ts
+│   │   ├── @types
+│   │   │   ├── node
+│   │   │   │   ├── LICENSE
+│   │   │   │   ├── README.md
+│   │   │   │   ├── assert
+│   │   │   │   │   └── strict.d.ts
+│   │   │   │   ├── assert.d.ts
+│   │   │   │   ├── async_hooks.d.ts
+│   │   │   │   ├── buffer.buffer.d.ts
+│   │   │   │   ├── buffer.d.ts
+│   │   │   │   ├── child_process.d.ts
+│   │   │   │   ├── cluster.d.ts
+│   │   │   │   ├── compatibility
+│   │   │   │   │   ├── disposable.d.ts
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── indexable.d.ts
+│   │   │   │   │   └── iterators.d.ts
+│   │   │   │   ├── console.d.ts
+│   │   │   │   ├── constants.d.ts
+│   │   │   │   ├── crypto.d.ts
+│   │   │   │   ├── dgram.d.ts
+│   │   │   │   ├── diagnostics_channel.d.ts
+│   │   │   │   ├── dns
+│   │   │   │   │   └── promises.d.ts
+│   │   │   │   ├── dns.d.ts
+│   │   │   │   ├── dom-events.d.ts
+│   │   │   │   ├── domain.d.ts
+│   │   │   │   ├── events.d.ts
+│   │   │   │   ├── fs
+│   │   │   │   │   └── promises.d.ts
+│   │   │   │   ├── fs.d.ts
+│   │   │   │   ├── globals.d.ts
+│   │   │   │   ├── globals.typedarray.d.ts
+│   │   │   │   ├── http.d.ts
+│   │   │   │   ├── http2.d.ts
+│   │   │   │   ├── https.d.ts
+│   │   │   │   ├── index.d.ts
+│   │   │   │   ├── inspector.d.ts
+│   │   │   │   ├── module.d.ts
+│   │   │   │   ├── net.d.ts
+│   │   │   │   ├── os.d.ts
+│   │   │   │   ├── package.json
+│   │   │   │   ├── path.d.ts
+│   │   │   │   ├── perf_hooks.d.ts
+│   │   │   │   ├── process.d.ts
+│   │   │   │   ├── punycode.d.ts
+│   │   │   │   ├── querystring.d.ts
+│   │   │   │   ├── readline
+│   │   │   │   │   └── promises.d.ts
+│   │   │   │   ├── readline.d.ts
+│   │   │   │   ├── repl.d.ts
+│   │   │   │   ├── sea.d.ts
+│   │   │   │   ├── sqlite.d.ts
+│   │   │   │   ├── stream
+│   │   │   │   │   ├── consumers.d.ts
+│   │   │   │   │   ├── promises.d.ts
+│   │   │   │   │   └── web.d.ts
+│   │   │   │   ├── stream.d.ts
+│   │   │   │   ├── string_decoder.d.ts
+│   │   │   │   ├── test.d.ts
+│   │   │   │   ├── timers
+│   │   │   │   │   └── promises.d.ts
+│   │   │   │   ├── timers.d.ts
+│   │   │   │   ├── tls.d.ts
+│   │   │   │   ├── trace_events.d.ts
+│   │   │   │   ├── ts5.6
+│   │   │   │   │   ├── buffer.buffer.d.ts
+│   │   │   │   │   ├── globals.typedarray.d.ts
+│   │   │   │   │   └── index.d.ts
+│   │   │   │   ├── tty.d.ts
+│   │   │   │   ├── url.d.ts
+│   │   │   │   ├── util.d.ts
+│   │   │   │   ├── v8.d.ts
+│   │   │   │   ├── vm.d.ts
+│   │   │   │   ├── wasi.d.ts
+│   │   │   │   ├── worker_threads.d.ts
+│   │   │   │   └── zlib.d.ts
+│   │   │   ├── phoenix
+│   │   │   │   ├── LICENSE
+│   │   │   │   ├── README.md
+│   │   │   │   ├── index.d.ts
+│   │   │   │   └── package.json
+│   │   │   └── ws
+│   │   │       ├── LICENSE
+│   │   │       ├── README.md
+│   │   │       ├── index.d.mts
+│   │   │       ├── index.d.ts
+│   │   │       └── package.json
+│   │   ├── accepts
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── array-flatten
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── array-flatten.js
+│   │   │   └── package.json
+│   │   ├── body-parser
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── SECURITY.md
+│   │   │   ├── index.js
+│   │   │   ├── lib
+│   │   │   │   ├── read.js
+│   │   │   │   └── types
+│   │   │   │       ├── json.js
+│   │   │   │       ├── raw.js
+│   │   │   │       ├── text.js
+│   │   │   │       └── urlencoded.js
+│   │   │   └── package.json
+│   │   ├── bytes
+│   │   │   ├── History.md
+│   │   │   ├── LICENSE
+│   │   │   ├── Readme.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── call-bind-apply-helpers
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── actualApply.d.ts
+│   │   │   ├── actualApply.js
+│   │   │   ├── applyBind.d.ts
+│   │   │   ├── applyBind.js
+│   │   │   ├── functionApply.d.ts
+│   │   │   ├── functionApply.js
+│   │   │   ├── functionCall.d.ts
+│   │   │   ├── functionCall.js
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── reflectApply.d.ts
+│   │   │   ├── reflectApply.js
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── call-bound
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── content-disposition
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── content-type
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── cookie
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── SECURITY.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── cookie-signature
+│   │   │   ├── History.md
+│   │   │   ├── Readme.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── debug
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── Makefile
+│   │   │   ├── README.md
+│   │   │   ├── component.json
+│   │   │   ├── karma.conf.js
+│   │   │   ├── node.js
+│   │   │   ├── package.json
+│   │   │   └── src
+│   │   │       ├── browser.js
+│   │   │       ├── debug.js
+│   │   │       ├── index.js
+│   │   │       ├── inspector-log.js
+│   │   │       └── node.js
+│   │   ├── depd
+│   │   │   ├── History.md
+│   │   │   ├── LICENSE
+│   │   │   ├── Readme.md
+│   │   │   ├── index.js
+│   │   │   ├── lib
+│   │   │   │   └── browser
+│   │   │   │       └── index.js
+│   │   │   └── package.json
+│   │   ├── destroy
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── dotenv
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README-es.md
+│   │   │   ├── README.md
+│   │   │   ├── config.d.ts
+│   │   │   ├── config.js
+│   │   │   ├── lib
+│   │   │   │   ├── cli-options.js
+│   │   │   │   ├── env-options.js
+│   │   │   │   ├── main.d.ts
+│   │   │   │   └── main.js
+│   │   │   └── package.json
+│   │   ├── dunder-proto
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── get.d.ts
+│   │   │   ├── get.js
+│   │   │   ├── package.json
+│   │   │   ├── set.d.ts
+│   │   │   ├── set.js
+│   │   │   ├── test
+│   │   │   │   ├── get.js
+│   │   │   │   ├── index.js
+│   │   │   │   └── set.js
+│   │   │   └── tsconfig.json
+│   │   ├── ee-first
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── encodeurl
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── es-define-property
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── es-errors
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── eval.d.ts
+│   │   │   ├── eval.js
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── range.d.ts
+│   │   │   ├── range.js
+│   │   │   ├── ref.d.ts
+│   │   │   ├── ref.js
+│   │   │   ├── syntax.d.ts
+│   │   │   ├── syntax.js
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   ├── tsconfig.json
+│   │   │   ├── type.d.ts
+│   │   │   ├── type.js
+│   │   │   ├── uri.d.ts
+│   │   │   └── uri.js
+│   │   ├── es-object-atoms
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── RequireObjectCoercible.d.ts
+│   │   │   ├── RequireObjectCoercible.js
+│   │   │   ├── ToObject.d.ts
+│   │   │   ├── ToObject.js
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── isObject.d.ts
+│   │   │   ├── isObject.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── escape-html
+│   │   │   ├── LICENSE
+│   │   │   ├── Readme.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── etag
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── express
+│   │   │   ├── History.md
+│   │   │   ├── LICENSE
+│   │   │   ├── Readme.md
+│   │   │   ├── index.js
+│   │   │   ├── lib
+│   │   │   │   ├── application.js
+│   │   │   │   ├── express.js
+│   │   │   │   ├── middleware
+│   │   │   │   │   ├── init.js
+│   │   │   │   │   └── query.js
+│   │   │   │   ├── request.js
+│   │   │   │   ├── response.js
+│   │   │   │   ├── router
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── layer.js
+│   │   │   │   │   └── route.js
+│   │   │   │   ├── utils.js
+│   │   │   │   └── view.js
+│   │   │   └── package.json
+│   │   ├── finalhandler
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── SECURITY.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── forwarded
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── fresh
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── function-bind
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── implementation.js
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   └── test
+│   │   │       └── index.js
+│   │   ├── get-intrinsic
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   └── test
+│   │   │       └── GetIntrinsic.js
+│   │   ├── get-proto
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── Object.getPrototypeOf.d.ts
+│   │   │   ├── Object.getPrototypeOf.js
+│   │   │   ├── README.md
+│   │   │   ├── Reflect.getPrototypeOf.d.ts
+│   │   │   ├── Reflect.getPrototypeOf.js
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── gopd
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── gOPD.d.ts
+│   │   │   ├── gOPD.js
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── has-symbols
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── shams.d.ts
+│   │   │   ├── shams.js
+│   │   │   ├── test
+│   │   │   │   ├── index.js
+│   │   │   │   ├── shams
+│   │   │   │   │   ├── core-js.js
+│   │   │   │   │   └── get-own-property-symbols.js
+│   │   │   │   └── tests.js
+│   │   │   └── tsconfig.json
+│   │   ├── hasown
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   └── tsconfig.json
+│   │   ├── http-errors
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── iconv-lite
+│   │   │   ├── Changelog.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── encodings
+│   │   │   │   ├── dbcs-codec.js
+│   │   │   │   ├── dbcs-data.js
+│   │   │   │   ├── index.js
+│   │   │   │   ├── internal.js
+│   │   │   │   ├── sbcs-codec.js
+│   │   │   │   ├── sbcs-data-generated.js
+│   │   │   │   ├── sbcs-data.js
+│   │   │   │   ├── tables
+│   │   │   │   │   ├── big5-added.json
+│   │   │   │   │   ├── cp936.json
+│   │   │   │   │   ├── cp949.json
+│   │   │   │   │   ├── cp950.json
+│   │   │   │   │   ├── eucjp.json
+│   │   │   │   │   ├── gb18030-ranges.json
+│   │   │   │   │   ├── gbk-added.json
+│   │   │   │   │   └── shiftjis.json
+│   │   │   │   ├── utf16.js
+│   │   │   │   └── utf7.js
+│   │   │   ├── lib
+│   │   │   │   ├── bom-handling.js
+│   │   │   │   ├── extend-node.js
+│   │   │   │   ├── index.d.ts
+│   │   │   │   ├── index.js
+│   │   │   │   └── streams.js
+│   │   │   └── package.json
+│   │   ├── inherits
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── inherits.js
+│   │   │   ├── inherits_browser.js
+│   │   │   └── package.json
+│   │   ├── ipaddr.js
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── ipaddr.min.js
+│   │   │   ├── lib
+│   │   │   │   ├── ipaddr.js
+│   │   │   │   └── ipaddr.js.d.ts
+│   │   │   └── package.json
+│   │   ├── joi
+│   │   │   ├── LICENSE.md
+│   │   │   ├── README.md
+│   │   │   ├── dist
+│   │   │   │   └── joi-browser.min.js
+│   │   │   ├── lib
+│   │   │   │   ├── annotate.js
+│   │   │   │   ├── base.js
+│   │   │   │   ├── cache.js
+│   │   │   │   ├── common.js
+│   │   │   │   ├── compile.js
+│   │   │   │   ├── errors.js
+│   │   │   │   ├── extend.js
+│   │   │   │   ├── index.d.ts
+│   │   │   │   ├── index.js
+│   │   │   │   ├── manifest.js
+│   │   │   │   ├── messages.js
+│   │   │   │   ├── modify.js
+│   │   │   │   ├── ref.js
+│   │   │   │   ├── schemas.js
+│   │   │   │   ├── state.js
+│   │   │   │   ├── template.js
+│   │   │   │   ├── trace.js
+│   │   │   │   ├── types
+│   │   │   │   │   ├── alternatives.js
+│   │   │   │   │   ├── any.js
+│   │   │   │   │   ├── array.js
+│   │   │   │   │   ├── binary.js
+│   │   │   │   │   ├── boolean.js
+│   │   │   │   │   ├── date.js
+│   │   │   │   │   ├── function.js
+│   │   │   │   │   ├── keys.js
+│   │   │   │   │   ├── link.js
+│   │   │   │   │   ├── number.js
+│   │   │   │   │   ├── object.js
+│   │   │   │   │   ├── string.js
+│   │   │   │   │   └── symbol.js
+│   │   │   │   ├── validator.js
+│   │   │   │   └── values.js
+│   │   │   └── package.json
+│   │   ├── math-intrinsics
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── abs.d.ts
+│   │   │   ├── abs.js
+│   │   │   ├── constants
+│   │   │   │   ├── maxArrayLength.d.ts
+│   │   │   │   ├── maxArrayLength.js
+│   │   │   │   ├── maxSafeInteger.d.ts
+│   │   │   │   ├── maxSafeInteger.js
+│   │   │   │   ├── maxValue.d.ts
+│   │   │   │   └── maxValue.js
+│   │   │   ├── floor.d.ts
+│   │   │   ├── floor.js
+│   │   │   ├── isFinite.d.ts
+│   │   │   ├── isFinite.js
+│   │   │   ├── isInteger.d.ts
+│   │   │   ├── isInteger.js
+│   │   │   ├── isNaN.d.ts
+│   │   │   ├── isNaN.js
+│   │   │   ├── isNegativeZero.d.ts
+│   │   │   ├── isNegativeZero.js
+│   │   │   ├── max.d.ts
+│   │   │   ├── max.js
+│   │   │   ├── min.d.ts
+│   │   │   ├── min.js
+│   │   │   ├── mod.d.ts
+│   │   │   ├── mod.js
+│   │   │   ├── package.json
+│   │   │   ├── pow.d.ts
+│   │   │   ├── pow.js
+│   │   │   ├── round.d.ts
+│   │   │   ├── round.js
+│   │   │   ├── sign.d.ts
+│   │   │   ├── sign.js
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── media-typer
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── merge-descriptors
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── methods
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── mime
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── cli.js
+│   │   │   ├── mime.js
+│   │   │   ├── package.json
+│   │   │   ├── src
+│   │   │   │   ├── build.js
+│   │   │   │   └── test.js
+│   │   │   └── types.json
+│   │   ├── mime-db
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── db.json
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── mime-types
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── ms
+│   │   │   ├── index.js
+│   │   │   ├── license.md
+│   │   │   ├── package.json
+│   │   │   └── readme.md
+│   │   ├── negotiator
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   ├── lib
+│   │   │   │   ├── charset.js
+│   │   │   │   ├── encoding.js
+│   │   │   │   ├── language.js
+│   │   │   │   └── mediaType.js
+│   │   │   └── package.json
+│   │   ├── object-inspect
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── example
+│   │   │   │   ├── all.js
+│   │   │   │   ├── circular.js
+│   │   │   │   ├── fn.js
+│   │   │   │   └── inspect.js
+│   │   │   ├── index.js
+│   │   │   ├── package-support.json
+│   │   │   ├── package.json
+│   │   │   ├── readme.markdown
+│   │   │   ├── test
+│   │   │   │   ├── bigint.js
+│   │   │   │   ├── browser
+│   │   │   │   │   └── dom.js
+│   │   │   │   ├── circular.js
+│   │   │   │   ├── deep.js
+│   │   │   │   ├── element.js
+│   │   │   │   ├── err.js
+│   │   │   │   ├── fakes.js
+│   │   │   │   ├── fn.js
+│   │   │   │   ├── global.js
+│   │   │   │   ├── has.js
+│   │   │   │   ├── holes.js
+│   │   │   │   ├── indent-option.js
+│   │   │   │   ├── inspect.js
+│   │   │   │   ├── lowbyte.js
+│   │   │   │   ├── number.js
+│   │   │   │   ├── quoteStyle.js
+│   │   │   │   ├── toStringTag.js
+│   │   │   │   ├── undef.js
+│   │   │   │   └── values.js
+│   │   │   ├── test-core-js.js
+│   │   │   └── util.inspect.js
+│   │   ├── on-finished
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── parseurl
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── path-to-regexp
+│   │   │   ├── LICENSE
+│   │   │   ├── Readme.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── proxy-addr
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── qs
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE.md
+│   │   │   ├── README.md
+│   │   │   ├── dist
+│   │   │   │   └── qs.js
+│   │   │   ├── lib
+│   │   │   │   ├── formats.js
+│   │   │   │   ├── index.js
+│   │   │   │   ├── parse.js
+│   │   │   │   ├── stringify.js
+│   │   │   │   └── utils.js
+│   │   │   ├── package.json
+│   │   │   └── test
+│   │   │       ├── empty-keys-cases.js
+│   │   │       ├── parse.js
+│   │   │       ├── stringify.js
+│   │   │       └── utils.js
+│   │   ├── range-parser
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── raw-body
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── SECURITY.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── safe-buffer
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── safer-buffer
+│   │   │   ├── LICENSE
+│   │   │   ├── Porting-Buffer.md
+│   │   │   ├── Readme.md
+│   │   │   ├── dangerous.js
+│   │   │   ├── package.json
+│   │   │   ├── safer.js
+│   │   │   └── tests.js
+│   │   ├── send
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── SECURITY.md
+│   │   │   ├── index.js
+│   │   │   ├── node_modules
+│   │   │   │   ├── encodeurl
+│   │   │   │   │   ├── HISTORY.md
+│   │   │   │   │   ├── LICENSE
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   └── package.json
+│   │   │   │   └── ms
+│   │   │   │       ├── index.js
+│   │   │   │       ├── license.md
+│   │   │   │       ├── package.json
+│   │   │   │       └── readme.md
+│   │   │   └── package.json
+│   │   ├── serve-static
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── setprototypeof
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   └── test
+│   │   │       └── index.js
+│   │   ├── side-channel
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── side-channel-list
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── list.d.ts
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── side-channel-map
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── side-channel-weakmap
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
+│   │   │   ├── package.json
+│   │   │   ├── test
+│   │   │   │   └── index.js
+│   │   │   └── tsconfig.json
+│   │   ├── statuses
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── codes.json
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── toidentifier
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── tr46
+│   │   │   ├── index.js
+│   │   │   ├── lib
+│   │   │   │   └── mappingTable.json
+│   │   │   └── package.json
+│   │   ├── type-is
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── undici-types
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── agent.d.ts
+│   │   │   ├── api.d.ts
+│   │   │   ├── balanced-pool.d.ts
+│   │   │   ├── cache.d.ts
+│   │   │   ├── client.d.ts
+│   │   │   ├── connector.d.ts
+│   │   │   ├── content-type.d.ts
+│   │   │   ├── cookies.d.ts
+│   │   │   ├── diagnostics-channel.d.ts
+│   │   │   ├── dispatcher.d.ts
+│   │   │   ├── env-http-proxy-agent.d.ts
+│   │   │   ├── errors.d.ts
+│   │   │   ├── eventsource.d.ts
+│   │   │   ├── fetch.d.ts
+│   │   │   ├── file.d.ts
+│   │   │   ├── filereader.d.ts
+│   │   │   ├── formdata.d.ts
+│   │   │   ├── global-dispatcher.d.ts
+│   │   │   ├── global-origin.d.ts
+│   │   │   ├── handlers.d.ts
+│   │   │   ├── header.d.ts
+│   │   │   ├── index.d.ts
+│   │   │   ├── interceptors.d.ts
+│   │   │   ├── mock-agent.d.ts
+│   │   │   ├── mock-client.d.ts
+│   │   │   ├── mock-errors.d.ts
+│   │   │   ├── mock-interceptor.d.ts
+│   │   │   ├── mock-pool.d.ts
+│   │   │   ├── package.json
+│   │   │   ├── patch.d.ts
+│   │   │   ├── pool-stats.d.ts
+│   │   │   ├── pool.d.ts
+│   │   │   ├── proxy-agent.d.ts
+│   │   │   ├── readable.d.ts
+│   │   │   ├── retry-agent.d.ts
+│   │   │   ├── retry-handler.d.ts
+│   │   │   ├── util.d.ts
+│   │   │   ├── webidl.d.ts
+│   │   │   └── websocket.d.ts
+│   │   ├── unpipe
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── utils-merge
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── vary
+│   │   │   ├── HISTORY.md
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.js
+│   │   │   └── package.json
+│   │   ├── webidl-conversions
+│   │   │   ├── LICENSE.md
+│   │   │   ├── README.md
+│   │   │   ├── lib
+│   │   │   │   └── index.js
+│   │   │   └── package.json
+│   │   ├── whatwg-url
+│   │   │   ├── LICENSE.txt
+│   │   │   ├── README.md
+│   │   │   ├── lib
+│   │   │   │   ├── URL-impl.js
+│   │   │   │   ├── URL.js
+│   │   │   │   ├── public-api.js
+│   │   │   │   ├── url-state-machine.js
+│   │   │   │   └── utils.js
+│   │   │   └── package.json
+│   │   └── ws
+│   │       ├── LICENSE
+│   │       ├── README.md
+│   │       ├── browser.js
+│   │       ├── index.js
+│   │       ├── lib
+│   │       │   ├── buffer-util.js
+│   │       │   ├── constants.js
+│   │       │   ├── event-target.js
+│   │       │   ├── extension.js
+│   │       │   ├── limiter.js
+│   │       │   ├── permessage-deflate.js
+│   │       │   ├── receiver.js
+│   │       │   ├── sender.js
+│   │       │   ├── stream.js
+│   │       │   ├── subprotocol.js
+│   │       │   ├── validation.js
+│   │       │   ├── websocket-server.js
+│   │       │   └── websocket.js
+│   │       ├── package.json
+│   │       └── wrapper.mjs
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── paiementController.js
+│   ├── profs.js
+│   ├── supabaseClient.js
+│   └── validators
+│       ├── coursValidator.js
+│       ├── disponibiliteValidator.js
+│       ├── eleveValidator.js
+│       ├── notificationValidator.js
+│       ├── profValidator.js
+│       └── reservationValidator.js
+├── cmd_git.txt
+├── docker-compose.yml
+├── generate_jwt.sh
+├── insert_fake_notifications.sh
+├── node_modules
+│   ├── @supabase
+│   │   ├── auth-js
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── dist
+│   │   │   │   ├── main
+│   │   │   │   │   ├── AuthAdminApi.d.ts
+│   │   │   │   │   ├── AuthAdminApi.d.ts.map
+│   │   │   │   │   ├── AuthAdminApi.js
+│   │   │   │   │   ├── AuthAdminApi.js.map
+│   │   │   │   │   ├── AuthClient.d.ts
+│   │   │   │   │   ├── AuthClient.d.ts.map
+│   │   │   │   │   ├── AuthClient.js
+│   │   │   │   │   ├── AuthClient.js.map
+│   │   │   │   │   ├── GoTrueAdminApi.d.ts
+│   │   │   │   │   ├── GoTrueAdminApi.d.ts.map
+│   │   │   │   │   ├── GoTrueAdminApi.js
+│   │   │   │   │   ├── GoTrueAdminApi.js.map
+│   │   │   │   │   ├── GoTrueClient.d.ts
+│   │   │   │   │   ├── GoTrueClient.d.ts.map
+│   │   │   │   │   ├── GoTrueClient.js
+│   │   │   │   │   ├── GoTrueClient.js.map
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── index.js.map
+│   │   │   │   │   └── lib
+│   │   │   │   │       ├── base64url.d.ts
+│   │   │   │   │       ├── base64url.d.ts.map
+│   │   │   │   │       ├── base64url.js
+│   │   │   │   │       ├── base64url.js.map
+│   │   │   │   │       ├── constants.d.ts
+│   │   │   │   │       ├── constants.d.ts.map
+│   │   │   │   │       ├── constants.js
+│   │   │   │   │       ├── constants.js.map
+│   │   │   │   │       ├── error-codes.d.ts
+│   │   │   │   │       ├── error-codes.d.ts.map
+│   │   │   │   │       ├── error-codes.js
+│   │   │   │   │       ├── error-codes.js.map
+│   │   │   │   │       ├── errors.d.ts
+│   │   │   │   │       ├── errors.d.ts.map
+│   │   │   │   │       ├── errors.js
+│   │   │   │   │       ├── errors.js.map
+│   │   │   │   │       ├── fetch.d.ts
+│   │   │   │   │       ├── fetch.d.ts.map
+│   │   │   │   │       ├── fetch.js
+│   │   │   │   │       ├── fetch.js.map
+│   │   │   │   │       ├── helpers.d.ts
+│   │   │   │   │       ├── helpers.d.ts.map
+│   │   │   │   │       ├── helpers.js
+│   │   │   │   │       ├── helpers.js.map
+│   │   │   │   │       ├── local-storage.d.ts
+│   │   │   │   │       ├── local-storage.d.ts.map
+│   │   │   │   │       ├── local-storage.js
+│   │   │   │   │       ├── local-storage.js.map
+│   │   │   │   │       ├── locks.d.ts
+│   │   │   │   │       ├── locks.d.ts.map
+│   │   │   │   │       ├── locks.js
+│   │   │   │   │       ├── locks.js.map
+│   │   │   │   │       ├── polyfills.d.ts
+│   │   │   │   │       ├── polyfills.d.ts.map
+│   │   │   │   │       ├── polyfills.js
+│   │   │   │   │       ├── polyfills.js.map
+│   │   │   │   │       ├── types.d.ts
+│   │   │   │   │       ├── types.d.ts.map
+│   │   │   │   │       ├── types.js
+│   │   │   │   │       ├── types.js.map
+│   │   │   │   │       ├── version.d.ts
+│   │   │   │   │       ├── version.d.ts.map
+│   │   │   │   │       ├── version.js
+│   │   │   │   │       └── version.js.map
+│   │   │   │   └── module
+│   │   │   │       ├── AuthAdminApi.d.ts
+│   │   │   │       ├── AuthAdminApi.d.ts.map
+│   │   │   │       ├── AuthAdminApi.js
+│   │   │   │       ├── AuthAdminApi.js.map
+│   │   │   │       ├── AuthClient.d.ts
+│   │   │   │       ├── AuthClient.d.ts.map
+│   │   │   │       ├── AuthClient.js
+│   │   │   │       ├── AuthClient.js.map
+│   │   │   │       ├── GoTrueAdminApi.d.ts
+│   │   │   │       ├── GoTrueAdminApi.d.ts.map
+│   │   │   │       ├── GoTrueAdminApi.js
+│   │   │   │       ├── GoTrueAdminApi.js.map
+│   │   │   │       ├── GoTrueClient.d.ts
+│   │   │   │       ├── GoTrueClient.d.ts.map
+│   │   │   │       ├── GoTrueClient.js
+│   │   │   │       ├── GoTrueClient.js.map
+│   │   │   │       ├── index.d.ts
+│   │   │   │       ├── index.d.ts.map
+│   │   │   │       ├── index.js
+│   │   │   │       ├── index.js.map
+│   │   │   │       └── lib
+│   │   │   │           ├── base64url.d.ts
+│   │   │   │           ├── base64url.d.ts.map
+│   │   │   │           ├── base64url.js
+│   │   │   │           ├── base64url.js.map
+│   │   │   │           ├── constants.d.ts
+│   │   │   │           ├── constants.d.ts.map
+│   │   │   │           ├── constants.js
+│   │   │   │           ├── constants.js.map
+│   │   │   │           ├── error-codes.d.ts
+│   │   │   │           ├── error-codes.d.ts.map
+│   │   │   │           ├── error-codes.js
+│   │   │   │           ├── error-codes.js.map
+│   │   │   │           ├── errors.d.ts
+│   │   │   │           ├── errors.d.ts.map
+│   │   │   │           ├── errors.js
+│   │   │   │           ├── errors.js.map
+│   │   │   │           ├── fetch.d.ts
+│   │   │   │           ├── fetch.d.ts.map
+│   │   │   │           ├── fetch.js
+│   │   │   │           ├── fetch.js.map
+│   │   │   │           ├── helpers.d.ts
+│   │   │   │           ├── helpers.d.ts.map
+│   │   │   │           ├── helpers.js
+│   │   │   │           ├── helpers.js.map
+│   │   │   │           ├── local-storage.d.ts
+│   │   │   │           ├── local-storage.d.ts.map
+│   │   │   │           ├── local-storage.js
+│   │   │   │           ├── local-storage.js.map
+│   │   │   │           ├── locks.d.ts
+│   │   │   │           ├── locks.d.ts.map
+│   │   │   │           ├── locks.js
+│   │   │   │           ├── locks.js.map
+│   │   │   │           ├── polyfills.d.ts
+│   │   │   │           ├── polyfills.d.ts.map
+│   │   │   │           ├── polyfills.js
+│   │   │   │           ├── polyfills.js.map
+│   │   │   │           ├── types.d.ts
+│   │   │   │           ├── types.d.ts.map
+│   │   │   │           ├── types.js
+│   │   │   │           ├── types.js.map
+│   │   │   │           ├── version.d.ts
+│   │   │   │           ├── version.d.ts.map
+│   │   │   │           ├── version.js
+│   │   │   │           └── version.js.map
+│   │   │   ├── package.json
+│   │   │   └── src
+│   │   │       ├── AuthAdminApi.ts
+│   │   │       ├── AuthClient.ts
+│   │   │       ├── GoTrueAdminApi.ts
+│   │   │       ├── GoTrueClient.ts
+│   │   │       ├── index.ts
+│   │   │       └── lib
+│   │   │           ├── base64url.ts
+│   │   │           ├── constants.ts
+│   │   │           ├── error-codes.ts
+│   │   │           ├── errors.ts
+│   │   │           ├── fetch.ts
+│   │   │           ├── helpers.ts
+│   │   │           ├── local-storage.ts
+│   │   │           ├── locks.ts
+│   │   │           ├── polyfills.ts
+│   │   │           ├── types.ts
+│   │   │           └── version.ts
+│   │   ├── functions-js
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── dist
+│   │   │   │   ├── main
+│   │   │   │   │   ├── FunctionsClient.d.ts
+│   │   │   │   │   ├── FunctionsClient.d.ts.map
+│   │   │   │   │   ├── FunctionsClient.js
+│   │   │   │   │   ├── FunctionsClient.js.map
+│   │   │   │   │   ├── helper.d.ts
+│   │   │   │   │   ├── helper.d.ts.map
+│   │   │   │   │   ├── helper.js
+│   │   │   │   │   ├── helper.js.map
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── index.js.map
+│   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   ├── types.js
+│   │   │   │   │   ├── types.js.map
+│   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   ├── version.js
+│   │   │   │   │   └── version.js.map
+│   │   │   │   └── module
+│   │   │   │       ├── FunctionsClient.d.ts
+│   │   │   │       ├── FunctionsClient.d.ts.map
+│   │   │   │       ├── FunctionsClient.js
+│   │   │   │       ├── FunctionsClient.js.map
+│   │   │   │       ├── helper.d.ts
+│   │   │   │       ├── helper.d.ts.map
+│   │   │   │       ├── helper.js
+│   │   │   │       ├── helper.js.map
+│   │   │   │       ├── index.d.ts
+│   │   │   │       ├── index.d.ts.map
+│   │   │   │       ├── index.js
+│   │   │   │       ├── index.js.map
+│   │   │   │       ├── types.d.ts
+│   │   │   │       ├── types.d.ts.map
+│   │   │   │       ├── types.js
+│   │   │   │       ├── types.js.map
+│   │   │   │       ├── version.d.ts
+│   │   │   │       ├── version.d.ts.map
+│   │   │   │       ├── version.js
+│   │   │   │       └── version.js.map
+│   │   │   ├── package.json
+│   │   │   └── src
+│   │   │       ├── FunctionsClient.ts
+│   │   │       ├── edge-runtime.d.ts
+│   │   │       ├── helper.ts
+│   │   │       ├── index.ts
+│   │   │       ├── types.ts
+│   │   │       └── version.ts
+│   │   ├── node-fetch
+│   │   │   ├── LICENSE.md
+│   │   │   ├── README.md
+│   │   │   ├── browser.js
+│   │   │   ├── lib
+│   │   │   │   ├── index.es.js
+│   │   │   │   ├── index.js
+│   │   │   │   └── index.mjs
+│   │   │   └── package.json
+│   │   ├── postgrest-js
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── dist
+│   │   │   │   ├── cjs
+│   │   │   │   │   ├── PostgrestBuilder.d.ts
+│   │   │   │   │   ├── PostgrestBuilder.d.ts.map
+│   │   │   │   │   ├── PostgrestBuilder.js
+│   │   │   │   │   ├── PostgrestBuilder.js.map
+│   │   │   │   │   ├── PostgrestClient.d.ts
+│   │   │   │   │   ├── PostgrestClient.d.ts.map
+│   │   │   │   │   ├── PostgrestClient.js
+│   │   │   │   │   ├── PostgrestClient.js.map
+│   │   │   │   │   ├── PostgrestError.d.ts
+│   │   │   │   │   ├── PostgrestError.d.ts.map
+│   │   │   │   │   ├── PostgrestError.js
+│   │   │   │   │   ├── PostgrestError.js.map
+│   │   │   │   │   ├── PostgrestFilterBuilder.d.ts
+│   │   │   │   │   ├── PostgrestFilterBuilder.d.ts.map
+│   │   │   │   │   ├── PostgrestFilterBuilder.js
+│   │   │   │   │   ├── PostgrestFilterBuilder.js.map
+│   │   │   │   │   ├── PostgrestQueryBuilder.d.ts
+│   │   │   │   │   ├── PostgrestQueryBuilder.d.ts.map
+│   │   │   │   │   ├── PostgrestQueryBuilder.js
+│   │   │   │   │   ├── PostgrestQueryBuilder.js.map
+│   │   │   │   │   ├── PostgrestTransformBuilder.d.ts
+│   │   │   │   │   ├── PostgrestTransformBuilder.d.ts.map
+│   │   │   │   │   ├── PostgrestTransformBuilder.js
+│   │   │   │   │   ├── PostgrestTransformBuilder.js.map
+│   │   │   │   │   ├── constants.d.ts
+│   │   │   │   │   ├── constants.d.ts.map
+│   │   │   │   │   ├── constants.js
+│   │   │   │   │   ├── constants.js.map
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── index.js.map
+│   │   │   │   │   ├── select-query-parser
+│   │   │   │   │   │   ├── parser.d.ts
+│   │   │   │   │   │   ├── parser.d.ts.map
+│   │   │   │   │   │   ├── parser.js
+│   │   │   │   │   │   ├── parser.js.map
+│   │   │   │   │   │   ├── result.d.ts
+│   │   │   │   │   │   ├── result.d.ts.map
+│   │   │   │   │   │   ├── result.js
+│   │   │   │   │   │   ├── result.js.map
+│   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   ├── utils.d.ts
+│   │   │   │   │   │   ├── utils.d.ts.map
+│   │   │   │   │   │   ├── utils.js
+│   │   │   │   │   │   └── utils.js.map
+│   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   ├── types.js
+│   │   │   │   │   ├── types.js.map
+│   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   ├── version.js
+│   │   │   │   │   └── version.js.map
+│   │   │   │   └── esm
+│   │   │   │       └── wrapper.mjs
+│   │   │   ├── package.json
+│   │   │   └── src
+│   │   │       ├── PostgrestBuilder.ts
+│   │   │       ├── PostgrestClient.ts
+│   │   │       ├── PostgrestError.ts
+│   │   │       ├── PostgrestFilterBuilder.ts
+│   │   │       ├── PostgrestQueryBuilder.ts
+│   │   │       ├── PostgrestTransformBuilder.ts
+│   │   │       ├── constants.ts
+│   │   │       ├── index.ts
+│   │   │       ├── select-query-parser
+│   │   │       │   ├── parser.ts
+│   │   │       │   ├── result.ts
+│   │   │       │   ├── types.ts
+│   │   │       │   └── utils.ts
+│   │   │       ├── types.ts
+│   │   │       └── version.ts
+│   │   ├── realtime-js
+│   │   │   ├── LICENSE.md
+│   │   │   ├── README.md
+│   │   │   ├── dist
+│   │   │   │   ├── main
+│   │   │   │   │   ├── RealtimeChannel.d.ts
+│   │   │   │   │   ├── RealtimeChannel.d.ts.map
+│   │   │   │   │   ├── RealtimeChannel.js
+│   │   │   │   │   ├── RealtimeChannel.js.map
+│   │   │   │   │   ├── RealtimeClient.d.ts
+│   │   │   │   │   ├── RealtimeClient.d.ts.map
+│   │   │   │   │   ├── RealtimeClient.js
+│   │   │   │   │   ├── RealtimeClient.js.map
+│   │   │   │   │   ├── RealtimePresence.d.ts
+│   │   │   │   │   ├── RealtimePresence.d.ts.map
+│   │   │   │   │   ├── RealtimePresence.js
+│   │   │   │   │   ├── RealtimePresence.js.map
+│   │   │   │   │   ├── WebSocket.browser.d.ts
+│   │   │   │   │   ├── WebSocket.browser.d.ts.map
+│   │   │   │   │   ├── WebSocket.browser.js
+│   │   │   │   │   ├── WebSocket.browser.js.map
+│   │   │   │   │   ├── WebSocket.d.ts
+│   │   │   │   │   ├── WebSocket.d.ts.map
+│   │   │   │   │   ├── WebSocket.js
+│   │   │   │   │   ├── WebSocket.js.map
+│   │   │   │   │   ├── WebSocket.native.d.ts
+│   │   │   │   │   ├── WebSocket.native.d.ts.map
+│   │   │   │   │   ├── WebSocket.native.js
+│   │   │   │   │   ├── WebSocket.native.js.map
+│   │   │   │   │   ├── WebSocket.node.d.ts
+│   │   │   │   │   ├── WebSocket.node.d.ts.map
+│   │   │   │   │   ├── WebSocket.node.js
+│   │   │   │   │   ├── WebSocket.node.js.map
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── index.js.map
+│   │   │   │   │   └── lib
+│   │   │   │   │       ├── constants.d.ts
+│   │   │   │   │       ├── constants.d.ts.map
+│   │   │   │   │       ├── constants.js
+│   │   │   │   │       ├── constants.js.map
+│   │   │   │   │       ├── push.d.ts
+│   │   │   │   │       ├── push.d.ts.map
+│   │   │   │   │       ├── push.js
+│   │   │   │   │       ├── push.js.map
+│   │   │   │   │       ├── serializer.d.ts
+│   │   │   │   │       ├── serializer.d.ts.map
+│   │   │   │   │       ├── serializer.js
+│   │   │   │   │       ├── serializer.js.map
+│   │   │   │   │       ├── timer.d.ts
+│   │   │   │   │       ├── timer.d.ts.map
+│   │   │   │   │       ├── timer.js
+│   │   │   │   │       ├── timer.js.map
+│   │   │   │   │       ├── transformers.d.ts
+│   │   │   │   │       ├── transformers.d.ts.map
+│   │   │   │   │       ├── transformers.js
+│   │   │   │   │       ├── transformers.js.map
+│   │   │   │   │       ├── version.d.ts
+│   │   │   │   │       ├── version.d.ts.map
+│   │   │   │   │       ├── version.js
+│   │   │   │   │       └── version.js.map
+│   │   │   │   └── module
+│   │   │   │       ├── RealtimeChannel.d.ts
+│   │   │   │       ├── RealtimeChannel.d.ts.map
+│   │   │   │       ├── RealtimeChannel.js
+│   │   │   │       ├── RealtimeChannel.js.map
+│   │   │   │       ├── RealtimeClient.d.ts
+│   │   │   │       ├── RealtimeClient.d.ts.map
+│   │   │   │       ├── RealtimeClient.js
+│   │   │   │       ├── RealtimeClient.js.map
+│   │   │   │       ├── RealtimePresence.d.ts
+│   │   │   │       ├── RealtimePresence.d.ts.map
+│   │   │   │       ├── RealtimePresence.js
+│   │   │   │       ├── RealtimePresence.js.map
+│   │   │   │       ├── WebSocket.browser.d.ts
+│   │   │   │       ├── WebSocket.browser.d.ts.map
+│   │   │   │       ├── WebSocket.browser.js
+│   │   │   │       ├── WebSocket.browser.js.map
+│   │   │   │       ├── WebSocket.d.ts
+│   │   │   │       ├── WebSocket.d.ts.map
+│   │   │   │       ├── WebSocket.js
+│   │   │   │       ├── WebSocket.js.map
+│   │   │   │       ├── WebSocket.native.d.ts
+│   │   │   │       ├── WebSocket.native.d.ts.map
+│   │   │   │       ├── WebSocket.native.js
+│   │   │   │       ├── WebSocket.native.js.map
+│   │   │   │       ├── WebSocket.node.d.ts
+│   │   │   │       ├── WebSocket.node.d.ts.map
+│   │   │   │       ├── WebSocket.node.js
+│   │   │   │       ├── WebSocket.node.js.map
+│   │   │   │       ├── index.d.ts
+│   │   │   │       ├── index.d.ts.map
+│   │   │   │       ├── index.js
+│   │   │   │       ├── index.js.map
+│   │   │   │       └── lib
+│   │   │   │           ├── constants.d.ts
+│   │   │   │           ├── constants.d.ts.map
+│   │   │   │           ├── constants.js
+│   │   │   │           ├── constants.js.map
+│   │   │   │           ├── push.d.ts
+│   │   │   │           ├── push.d.ts.map
+│   │   │   │           ├── push.js
+│   │   │   │           ├── push.js.map
+│   │   │   │           ├── serializer.d.ts
+│   │   │   │           ├── serializer.d.ts.map
+│   │   │   │           ├── serializer.js
+│   │   │   │           ├── serializer.js.map
+│   │   │   │           ├── timer.d.ts
+│   │   │   │           ├── timer.d.ts.map
+│   │   │   │           ├── timer.js
+│   │   │   │           ├── timer.js.map
+│   │   │   │           ├── transformers.d.ts
+│   │   │   │           ├── transformers.d.ts.map
+│   │   │   │           ├── transformers.js
+│   │   │   │           ├── transformers.js.map
+│   │   │   │           ├── version.d.ts
+│   │   │   │           ├── version.d.ts.map
+│   │   │   │           ├── version.js
+│   │   │   │           └── version.js.map
+│   │   │   ├── package.json
+│   │   │   └── src
+│   │   │       ├── RealtimeChannel.ts
+│   │   │       ├── RealtimeClient.ts
+│   │   │       ├── RealtimePresence.ts
+│   │   │       ├── WebSocket.browser.ts
+│   │   │       ├── WebSocket.native.ts
+│   │   │       ├── WebSocket.node.ts
+│   │   │       ├── WebSocket.ts
+│   │   │       ├── index.ts
+│   │   │       └── lib
+│   │   │           ├── constants.ts
+│   │   │           ├── push.ts
+│   │   │           ├── serializer.ts
+│   │   │           ├── timer.ts
+│   │   │           ├── transformers.ts
+│   │   │           └── version.ts
+│   │   ├── storage-js
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── dist
+│   │   │   │   ├── main
+│   │   │   │   │   ├── StorageClient.d.ts
+│   │   │   │   │   ├── StorageClient.d.ts.map
+│   │   │   │   │   ├── StorageClient.js
+│   │   │   │   │   ├── StorageClient.js.map
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── index.js.map
+│   │   │   │   │   ├── lib
+│   │   │   │   │   │   ├── constants.d.ts
+│   │   │   │   │   │   ├── constants.d.ts.map
+│   │   │   │   │   │   ├── constants.js
+│   │   │   │   │   │   ├── constants.js.map
+│   │   │   │   │   │   ├── errors.d.ts
+│   │   │   │   │   │   ├── errors.d.ts.map
+│   │   │   │   │   │   ├── errors.js
+│   │   │   │   │   │   ├── errors.js.map
+│   │   │   │   │   │   ├── fetch.d.ts
+│   │   │   │   │   │   ├── fetch.d.ts.map
+│   │   │   │   │   │   ├── fetch.js
+│   │   │   │   │   │   ├── fetch.js.map
+│   │   │   │   │   │   ├── helpers.d.ts
+│   │   │   │   │   │   ├── helpers.d.ts.map
+│   │   │   │   │   │   ├── helpers.js
+│   │   │   │   │   │   ├── helpers.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   │   ├── version.js
+│   │   │   │   │   │   └── version.js.map
+│   │   │   │   │   └── packages
+│   │   │   │   │       ├── StorageBucketApi.d.ts
+│   │   │   │   │       ├── StorageBucketApi.d.ts.map
+│   │   │   │   │       ├── StorageBucketApi.js
+│   │   │   │   │       ├── StorageBucketApi.js.map
+│   │   │   │   │       ├── StorageFileApi.d.ts
+│   │   │   │   │       ├── StorageFileApi.d.ts.map
+│   │   │   │   │       ├── StorageFileApi.js
+│   │   │   │   │       └── StorageFileApi.js.map
+│   │   │   │   ├── module
+│   │   │   │   │   ├── StorageClient.d.ts
+│   │   │   │   │   ├── StorageClient.d.ts.map
+│   │   │   │   │   ├── StorageClient.js
+│   │   │   │   │   ├── StorageClient.js.map
+│   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── index.js.map
+│   │   │   │   │   ├── lib
+│   │   │   │   │   │   ├── constants.d.ts
+│   │   │   │   │   │   ├── constants.d.ts.map
+│   │   │   │   │   │   ├── constants.js
+│   │   │   │   │   │   ├── constants.js.map
+│   │   │   │   │   │   ├── errors.d.ts
+│   │   │   │   │   │   ├── errors.d.ts.map
+│   │   │   │   │   │   ├── errors.js
+│   │   │   │   │   │   ├── errors.js.map
+│   │   │   │   │   │   ├── fetch.d.ts
+│   │   │   │   │   │   ├── fetch.d.ts.map
+│   │   │   │   │   │   ├── fetch.js
+│   │   │   │   │   │   ├── fetch.js.map
+│   │   │   │   │   │   ├── helpers.d.ts
+│   │   │   │   │   │   ├── helpers.d.ts.map
+│   │   │   │   │   │   ├── helpers.js
+│   │   │   │   │   │   ├── helpers.js.map
+│   │   │   │   │   │   ├── index.d.ts
+│   │   │   │   │   │   ├── index.d.ts.map
+│   │   │   │   │   │   ├── index.js
+│   │   │   │   │   │   ├── index.js.map
+│   │   │   │   │   │   ├── types.d.ts
+│   │   │   │   │   │   ├── types.d.ts.map
+│   │   │   │   │   │   ├── types.js
+│   │   │   │   │   │   ├── types.js.map
+│   │   │   │   │   │   ├── version.d.ts
+│   │   │   │   │   │   ├── version.d.ts.map
+│   │   │   │   │   │   ├── version.js
+│   │   │   │   │   │   └── version.js.map
+│   │   │   │   │   └── packages
+│   │   │   │   │       ├── StorageBucketApi.d.ts
+│   │   │   │   │       ├── StorageBucketApi.d.ts.map
+│   │   │   │   │       ├── StorageBucketApi.js
+│   │   │   │   │       ├── StorageBucketApi.js.map
+│   │   │   │   │       ├── StorageFileApi.d.ts
+│   │   │   │   │       ├── StorageFileApi.d.ts.map
+│   │   │   │   │       ├── StorageFileApi.js
+│   │   │   │   │       └── StorageFileApi.js.map
+│   │   │   │   └── umd
+│   │   │   │       └── supabase.js
+│   │   │   ├── package.json
+│   │   │   └── src
+│   │   │       ├── StorageClient.ts
+│   │   │       ├── index.ts
+│   │   │       ├── lib
+│   │   │       │   ├── constants.ts
+│   │   │       │   ├── errors.ts
+│   │   │       │   ├── fetch.ts
+│   │   │       │   ├── helpers.ts
+│   │   │       │   ├── index.ts
+│   │   │       │   ├── types.ts
+│   │   │       │   └── version.ts
+│   │   │       └── packages
+│   │   │           ├── StorageBucketApi.ts
+│   │   │           └── StorageFileApi.ts
+│   │   └── supabase-js
+│   │       ├── LICENSE
+│   │       ├── README.md
+│   │       ├── dist
+│   │       │   ├── main
+│   │       │   │   ├── SupabaseClient.d.ts
+│   │       │   │   ├── SupabaseClient.d.ts.map
+│   │       │   │   ├── SupabaseClient.js
+│   │       │   │   ├── SupabaseClient.js.map
+│   │       │   │   ├── index.d.ts
+│   │       │   │   ├── index.d.ts.map
+│   │       │   │   ├── index.js
+│   │       │   │   ├── index.js.map
+│   │       │   │   └── lib
+│   │       │   │       ├── SupabaseAuthClient.d.ts
+│   │       │   │       ├── SupabaseAuthClient.d.ts.map
+│   │       │   │       ├── SupabaseAuthClient.js
+│   │       │   │       ├── SupabaseAuthClient.js.map
+│   │       │   │       ├── constants.d.ts
+│   │       │   │       ├── constants.d.ts.map
+│   │       │   │       ├── constants.js
+│   │       │   │       ├── constants.js.map
+│   │       │   │       ├── fetch.d.ts
+│   │       │   │       ├── fetch.d.ts.map
+│   │       │   │       ├── fetch.js
+│   │       │   │       ├── fetch.js.map
+│   │       │   │       ├── helpers.d.ts
+│   │       │   │       ├── helpers.d.ts.map
+│   │       │   │       ├── helpers.js
+│   │       │   │       ├── helpers.js.map
+│   │       │   │       ├── types.d.ts
+│   │       │   │       ├── types.d.ts.map
+│   │       │   │       ├── types.js
+│   │       │   │       ├── types.js.map
+│   │       │   │       ├── version.d.ts
+│   │       │   │       ├── version.d.ts.map
+│   │       │   │       ├── version.js
+│   │       │   │       └── version.js.map
+│   │       │   ├── module
+│   │       │   │   ├── SupabaseClient.d.ts
+│   │       │   │   ├── SupabaseClient.d.ts.map
+│   │       │   │   ├── SupabaseClient.js
+│   │       │   │   ├── SupabaseClient.js.map
+│   │       │   │   ├── index.d.ts
+│   │       │   │   ├── index.d.ts.map
+│   │       │   │   ├── index.js
+│   │       │   │   ├── index.js.map
+│   │       │   │   └── lib
+│   │       │   │       ├── SupabaseAuthClient.d.ts
+│   │       │   │       ├── SupabaseAuthClient.d.ts.map
+│   │       │   │       ├── SupabaseAuthClient.js
+│   │       │   │       ├── SupabaseAuthClient.js.map
+│   │       │   │       ├── constants.d.ts
+│   │       │   │       ├── constants.d.ts.map
+│   │       │   │       ├── constants.js
+│   │       │   │       ├── constants.js.map
+│   │       │   │       ├── fetch.d.ts
+│   │       │   │       ├── fetch.d.ts.map
+│   │       │   │       ├── fetch.js
+│   │       │   │       ├── fetch.js.map
+│   │       │   │       ├── helpers.d.ts
+│   │       │   │       ├── helpers.d.ts.map
+│   │       │   │       ├── helpers.js
+│   │       │   │       ├── helpers.js.map
+│   │       │   │       ├── types.d.ts
+│   │       │   │       ├── types.d.ts.map
+│   │       │   │       ├── types.js
+│   │       │   │       ├── types.js.map
+│   │       │   │       ├── version.d.ts
+│   │       │   │       ├── version.d.ts.map
+│   │       │   │       ├── version.js
+│   │       │   │       └── version.js.map
+│   │       │   └── umd
+│   │       │       └── supabase.js
+│   │       ├── package.json
+│   │       └── src
+│   │           ├── SupabaseClient.ts
+│   │           ├── index.ts
+│   │           └── lib
+│   │               ├── SupabaseAuthClient.ts
+│   │               ├── constants.ts
+│   │               ├── fetch.ts
+│   │               ├── helpers.ts
+│   │               ├── types.ts
+│   │               └── version.ts
+│   ├── @types
+│   │   ├── node
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── assert
+│   │   │   │   └── strict.d.ts
+│   │   │   ├── assert.d.ts
+│   │   │   ├── async_hooks.d.ts
+│   │   │   ├── buffer.buffer.d.ts
+│   │   │   ├── buffer.d.ts
+│   │   │   ├── child_process.d.ts
+│   │   │   ├── cluster.d.ts
+│   │   │   ├── compatibility
+│   │   │   │   ├── disposable.d.ts
+│   │   │   │   ├── index.d.ts
+│   │   │   │   ├── indexable.d.ts
+│   │   │   │   └── iterators.d.ts
+│   │   │   ├── console.d.ts
+│   │   │   ├── constants.d.ts
+│   │   │   ├── crypto.d.ts
+│   │   │   ├── dgram.d.ts
+│   │   │   ├── diagnostics_channel.d.ts
+│   │   │   ├── dns
+│   │   │   │   └── promises.d.ts
+│   │   │   ├── dns.d.ts
+│   │   │   ├── dom-events.d.ts
+│   │   │   ├── domain.d.ts
+│   │   │   ├── events.d.ts
+│   │   │   ├── fs
+│   │   │   │   └── promises.d.ts
+│   │   │   ├── fs.d.ts
+│   │   │   ├── globals.d.ts
+│   │   │   ├── globals.typedarray.d.ts
+│   │   │   ├── http.d.ts
+│   │   │   ├── http2.d.ts
+│   │   │   ├── https.d.ts
+│   │   │   ├── index.d.ts
+│   │   │   ├── inspector.d.ts
+│   │   │   ├── module.d.ts
+│   │   │   ├── net.d.ts
+│   │   │   ├── os.d.ts
+│   │   │   ├── package.json
+│   │   │   ├── path.d.ts
+│   │   │   ├── perf_hooks.d.ts
+│   │   │   ├── process.d.ts
+│   │   │   ├── punycode.d.ts
+│   │   │   ├── querystring.d.ts
+│   │   │   ├── readline
+│   │   │   │   └── promises.d.ts
+│   │   │   ├── readline.d.ts
+│   │   │   ├── repl.d.ts
+│   │   │   ├── sea.d.ts
+│   │   │   ├── sqlite.d.ts
+│   │   │   ├── stream
+│   │   │   │   ├── consumers.d.ts
+│   │   │   │   ├── promises.d.ts
+│   │   │   │   └── web.d.ts
+│   │   │   ├── stream.d.ts
+│   │   │   ├── string_decoder.d.ts
+│   │   │   ├── test.d.ts
+│   │   │   ├── timers
+│   │   │   │   └── promises.d.ts
+│   │   │   ├── timers.d.ts
+│   │   │   ├── tls.d.ts
+│   │   │   ├── trace_events.d.ts
+│   │   │   ├── ts5.6
+│   │   │   │   ├── buffer.buffer.d.ts
+│   │   │   │   ├── globals.typedarray.d.ts
+│   │   │   │   └── index.d.ts
+│   │   │   ├── tty.d.ts
+│   │   │   ├── url.d.ts
+│   │   │   ├── util.d.ts
+│   │   │   ├── v8.d.ts
+│   │   │   ├── vm.d.ts
+│   │   │   ├── wasi.d.ts
+│   │   │   ├── worker_threads.d.ts
+│   │   │   └── zlib.d.ts
+│   │   ├── phoenix
+│   │   │   ├── LICENSE
+│   │   │   ├── README.md
+│   │   │   ├── index.d.ts
+│   │   │   └── package.json
+│   │   └── ws
+│   │       ├── LICENSE
+│   │       ├── README.md
+│   │       ├── index.d.mts
+│   │       ├── index.d.ts
+│   │       └── package.json
+│   ├── dotenv
+│   │   ├── CHANGELOG.md
+│   │   ├── LICENSE
+│   │   ├── README-es.md
+│   │   ├── README.md
+│   │   ├── config.d.ts
+│   │   ├── config.js
+│   │   ├── lib
+│   │   │   ├── cli-options.js
+│   │   │   ├── env-options.js
+│   │   │   ├── main.d.ts
+│   │   │   └── main.js
+│   │   └── package.json
+│   ├── tr46
+│   │   ├── index.js
+│   │   ├── lib
+│   │   │   └── mappingTable.json
+│   │   └── package.json
+│   ├── undici-types
+│   │   ├── LICENSE
+│   │   ├── README.md
+│   │   ├── agent.d.ts
+│   │   ├── api.d.ts
+│   │   ├── balanced-pool.d.ts
+│   │   ├── cache.d.ts
+│   │   ├── client.d.ts
+│   │   ├── connector.d.ts
+│   │   ├── content-type.d.ts
+│   │   ├── cookies.d.ts
+│   │   ├── diagnostics-channel.d.ts
+│   │   ├── dispatcher.d.ts
+│   │   ├── env-http-proxy-agent.d.ts
+│   │   ├── errors.d.ts
+│   │   ├── eventsource.d.ts
+│   │   ├── fetch.d.ts
+│   │   ├── file.d.ts
+│   │   ├── filereader.d.ts
+│   │   ├── formdata.d.ts
+│   │   ├── global-dispatcher.d.ts
+│   │   ├── global-origin.d.ts
+│   │   ├── handlers.d.ts
+│   │   ├── header.d.ts
+│   │   ├── index.d.ts
+│   │   ├── interceptors.d.ts
+│   │   ├── mock-agent.d.ts
+│   │   ├── mock-client.d.ts
+│   │   ├── mock-errors.d.ts
+│   │   ├── mock-interceptor.d.ts
+│   │   ├── mock-pool.d.ts
+│   │   ├── package.json
+│   │   ├── patch.d.ts
+│   │   ├── pool-stats.d.ts
+│   │   ├── pool.d.ts
+│   │   ├── proxy-agent.d.ts
+│   │   ├── readable.d.ts
+│   │   ├── retry-agent.d.ts
+│   │   ├── retry-handler.d.ts
+│   │   ├── util.d.ts
+│   │   ├── webidl.d.ts
+│   │   └── websocket.d.ts
+│   ├── webidl-conversions
+│   │   ├── LICENSE.md
+│   │   ├── README.md
+│   │   ├── lib
+│   │   │   └── index.js
+│   │   └── package.json
+│   ├── whatwg-url
+│   │   ├── LICENSE.txt
+│   │   ├── README.md
+│   │   ├── lib
+│   │   │   ├── URL-impl.js
+│   │   │   ├── URL.js
+│   │   │   ├── public-api.js
+│   │   │   ├── url-state-machine.js
+│   │   │   └── utils.js
+│   │   └── package.json
+│   └── ws
+│       ├── LICENSE
+│       ├── README.md
+│       ├── browser.js
+│       ├── index.js
+│       ├── lib
+│       │   ├── buffer-util.js
+│       │   ├── constants.js
+│       │   ├── event-target.js
+│       │   ├── extension.js
+│       │   ├── limiter.js
+│       │   ├── permessage-deflate.js
+│       │   ├── receiver.js
+│       │   ├── sender.js
+│       │   ├── stream.js
+│       │   ├── subprotocol.js
+│       │   ├── validation.js
+│       │   ├── websocket-server.js
+│       │   └── websocket.js
+│       ├── package.json
+│       └── wrapper.mjs
+├── package-lock.json
+├── package.json
+├── test_all_cours.sh
+├── test_all_notifications.sh
+├── test_all_reservations.sh
+├── test_cours.sh
+├── test_create_reservation.sh
+├── test_disponibilites.sh
+├── test_disponibilites1.sh
+├── test_disponibilites_delete.sh
+├── test_disponibilites_get.sh
+├── test_disponibilites_get_by_id.sh
+├── test_disponibilites_get_one.sh
+├── test_disponibilites_update.sh
+├── test_eleve.sh
+├── test_notifications.sh
+├── test_notifications_errors.sh
+├── test_pagination_ntification.sh
+├── test_prof.sh
+├── test_update_reservation.sh
+└── tree.txt
+
+282 directories, 2197 files

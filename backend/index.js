@@ -1,15 +1,37 @@
-const paiementController = require('./controllers/paiementController');
-const reservationsController = require('./controllers/reservationsController');
 require('dotenv').config();
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const Joi = require('joi');
+
+const abonnementController = require('./controllers/abonnementController');
+const paiementController = require('./controllers/paiementController');
+const reservationsController = require('./controllers/reservationsController');
+const notificationsController = require('./controllers/notificationsController');
+const disponibilitesController = require('./controllers/disponibilitesController');
 const { eleveSchema } = require('./validators/eleveValidator');
+const { coursSchema } = require('./validators/coursValidator');
+const { profSchema } = require('./validators/profValidator');
+
 const app = express();
 const PORT = 3001;
 
-app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementController.handleStripeWebhook);
 app.use(express.json());
+
+
+// app.get('/abonnements/all', authenticateToken, abonnementController.getAllAbonnements); // 🔒 Pour admin ou consultation
+// app.post('/abonnements/checkout', authenticateToken, abonnementController.createCheckoutSession); // 🚀 Démarre un paiement Stripeconst abonnementController = require('./controllers/abonnementController');
+// const paiementController = require('./controllers/paiementController');
+// const reservationsController = require('./controllers/reservationsController');
+// require('dotenv').config();
+// const express = require('express');
+// const { createClient } = require('@supabase/supabase-js');
+// const Joi = require('joi');
+// const { eleveSchema } = require('./validators/eleveValidator');
+// const app = express();
+// const PORT = 3001;
+
+// app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementController.handleStripeWebhook);
+// app.use(express.json());
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -43,8 +65,7 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-const { coursSchema } = require('./validators/coursValidator');
-const { profSchema } = require('./validators/profValidator');
+
 
 // ========== ROUTES ==========
 
@@ -299,7 +320,6 @@ app.delete('/cours/:id', authenticateToken, async (req, res) => {
 
 
 // notifications
-const notificationsController = require("./controllers/notificationsController");
 
 app.post("/notifications", authenticateToken, notificationsController.createNotification);
 app.get("/notifications", authenticateToken, notificationsController.getNotifications);
@@ -307,7 +327,6 @@ app.put("/notifications/:id", authenticateToken, notificationsController.markAsR
 app.delete("/notifications/:id", authenticateToken, notificationsController.deleteNotification);
 
 // disponibilite
-const disponibilitesController = require("./controllers/disponibilitesController");
 
 app.post("/disponibilites", authenticateToken, disponibilitesController.createDisponibilite);
 app.get("/disponibilites", authenticateToken, disponibilitesController.getDisponibilites);
@@ -324,9 +343,13 @@ app.get("/reservations/:id", authenticateToken, reservationsController.getReserv
 app.delete("/reservations/:id", authenticateToken, reservationsController.deleteReservation);
 app.put("/reservations/:id", authenticateToken, reservationsController.updateReservation);
 
-// index.js
-//app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementController.handleStripeWebhook);
+//  index.js
 
+app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementController.handleStripeWebhook);
+// abonnements
+app.get('/abonnements', authenticateToken, abonnementController.getAbonnementsForUser);
+app.get('/abonnements/all', authenticateToken, abonnementController.getAllAbonnements); // 🔒 Pour admin ou consultation
+app.post('/abonnements/checkout', authenticateToken, abonnementController.createCheckoutSession); // 🚀 Démarre un paiement Stripe
 app.listen(PORT, () => {
   console.log(`API en ecoute sur http://localhost:${PORT}`);
 });

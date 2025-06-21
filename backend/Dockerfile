@@ -13,6 +13,7 @@ COPY package*.json ./
 RUN npm install dotenv && \
     npm ci --ignore-scripts && \
     npm cache clean --force
+RUN npm install stripe
 RUN npm install dayjs
 # Étape d'exécution
 FROM node:20-alpine
@@ -24,7 +25,7 @@ COPY --from=builder /app/node_modules ./node_modules
 
 # Copier le code de l'application
 COPY . .
-
+COPY .env .env
 # Donner les bons droits
 RUN chown -R node:node /app && \
     apk add --no-cache curl

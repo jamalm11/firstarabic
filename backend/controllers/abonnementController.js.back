@@ -1,0 +1,48 @@
+// backend/controllers/abonnementController.js
+
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+const getAbonnementsForUser = async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('abonnements')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('start_date', { ascending: false });
+
+    if (error) {
+      console.error("Erreur Supabase:", error);
+      return res.status(500).json({ error: "Erreur récupération abonnements", details: error.message });
+    }
+
+    res.json({ success: true, abonnements: data });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur serveur", details: e.message });
+  }
+};
+
+const getAllAbonnements = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('abonnements')
+      .select('*')
+      .order('start_date', { ascending: false });
+
+    if (error) {
+      console.error("Erreur Supabase (admin):", error);
+      return res.status(500).json({ error: "Erreur récupération abonnements (admin)", details: error.message });
+    }
+
+    res.json({ success: true, abonnements: data });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur serveur", details: e.message });
+  }
+};
+
+module.exports = {
+  getAbonnementsForUser,
+  getAllAbonnements,
+};
