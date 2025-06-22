@@ -347,11 +347,12 @@ app.delete('/cours/:id', authenticateToken, async (req, res) => {
   }
 });
 
+ 
 // === PLANNING GLOBAL ===
-// Accessible aux profs et élèves via created_by (utilisateur connecté)
-
 app.get('/planning', authenticateToken, async (req, res) => {
   try {
+    const statut = req.query.statut || null;
+
     const { data, error } = await req.supabase
       .from('cours')
       .select(`
@@ -363,20 +364,24 @@ app.get('/planning', authenticateToken, async (req, res) => {
 
     if (error) throw error;
 
-    const planning = data.map(c => ({
-      id: c.id,
-      date: c.date,
-      statut: c.statut,
-      lien: c.jitsi_url,
-      prof: c.profs?.nom || null,
-      eleve: c.eleves?.nom || null
-    }));
+    const planning = data
+      .filter(c => !statut || c.statut === statut)
+      .map(c => ({
+        id: c.id,
+        date: c.date,
+        statut: c.statut,
+        lien: c.jitsi_url,
+        prof: c.profs?.nom || null,
+        eleve: c.eleves?.nom || null
+      }));
 
     res.json({ success: true, planning });
   } catch (e) {
     res.status(500).json({ error: "Erreur récupération planning", details: e.message });
   }
 });
+
+
 
 // Récupérer les emails
 
