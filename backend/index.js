@@ -347,6 +347,37 @@ app.delete('/cours/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// === PLANNING GLOBAL ===
+// Accessible aux profs et élèves via created_by (utilisateur connecté)
+
+app.get('/planning', authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await req.supabase
+      .from('cours')
+      .select(`
+        id, date, statut, jitsi_url,
+        profs (nom),
+        eleves (nom)
+      `)
+      .eq('created_by', req.user.id);
+
+    if (error) throw error;
+
+    const planning = data.map(c => ({
+      id: c.id,
+      date: c.date,
+      statut: c.statut,
+      lien: c.jitsi_url,
+      prof: c.profs?.nom || null,
+      eleve: c.eleves?.nom || null
+    }));
+
+    res.json({ success: true, planning });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur récupération planning", details: e.message });
+  }
+});
+
 // Récupérer les emails
 
 // notifications
@@ -380,6 +411,10 @@ app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementC
 app.get('/abonnements', authenticateToken, abonnementController.getAbonnementsForUser);
 app.get('/abonnements/all', authenticateToken, abonnementController.getAllAbonnements); // 🔒 Pour admin ou consultation
 app.post('/abonnements/checkout', authenticateToken, abonnementController.createCheckoutSession); // 🚀 Démarre un paiement Stripe
+
+
+
+
 app.listen(PORT, () => {
   console.log(`API en ecoute sur http://localhost:${PORT}`);
 });
