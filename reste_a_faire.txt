@@ -1,0 +1,38 @@
+
+⸻
+
+✅ Modules déjà validés :
+	•	Authentification (via Supabase)
+	•	Gestion des élèves ✅
+	•	Gestion des professeurs ✅
+	•	Création des cours + lien Jitsi ✅
+	•	Notifications via email (Nodemailer) ✅
+	•	Paiement Stripe + Webhook ✅
+	•	Abonnements avec checkout ✅
+	•	Disponibilités + Réservations ✅
+
+⸻
+
+🔜 Modules restants à traiter :
+	1.	🗓️ Gestion du planning complet (agenda global)
+	•	Vue calendrier côté prof et élève
+	•	Récupération des créneaux réservés et disponibles
+	•	Format API prêt pour intégration frontend
+	2.	💬 (Optionnel) Chat prof ↔ élève
+	•	Simple messagerie (Supabase Realtime ou table messages)
+	•	Notification par email en cas de nouveau message
+	3.	🧾 Facturation / Historique des paiements
+	•	Listing des paiements effectués (Stripe API)
+	•	Téléchargement de facture (optionnel)
+	4.	🌐 Frontend React (ou autre)
+	•	Connexion utilisateur
+	•	Pages : sélection du prof, réservation, paiement, tableau de bord
+	•	Intégration du backend et déploiement
+	5.	☁️ Déploiement complet (VPS / Render / Railway)
+	•	API backend + base de données + frontend
+	•	Configuration du nom de domaine et HTTPS
+
+⸻
+
+Souhaites-tu continuer avec le module agenda/planning ?
+Ou bien on passe directement au frontend ?
