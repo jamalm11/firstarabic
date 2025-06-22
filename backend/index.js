@@ -1,5 +1,6 @@
-require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const Joi = require('joi');
 
@@ -12,9 +13,11 @@ const { eleveSchema } = require('./validators/eleveValidator');
 const { coursSchema } = require('./validators/coursValidator');
 const { profSchema } = require('./validators/profValidator');
 const { sendEmail } = require('./utils/email');
+
 const app = express();
 const PORT = 3001;
 
+app.use(cors());
 app.use(express.json());
 
 

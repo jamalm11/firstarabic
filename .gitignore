@@ -1,1 +1,44 @@
+# 🔒 Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .env
+
+# 🔒 Supabase tokens or secrets (si jamais tu les génères en local)
+supabase/.temp/
+.supabase/
+
+# 🐳 Docker
+docker-compose.override.yml
+*.local.yml
+*.env.local
+Dockerfile.*
+
+# ⚙️ VSCode
+.vscode/
+
+# 🔧 OS files
+.DS_Store
+Thumbs.db
+
+# 🧪 Logs et autres fichiers inutiles
+logs/
+*.log
+
+# 🧹 Build frontend (React/Vite/etc.)
+frontend-firstarabic/dist/
+frontend-firstarabic/build/
+
+# 🧪 Test output
+coverage/
+
+# 🧾 Autres fichiers potentiellement sensibles
+*.pem
+*.key
+*.crt
+*.cert
+
+# 🚫 Lockfiles autres que celui utilisé
+yarn.lock
+pnpm-lock.yaml

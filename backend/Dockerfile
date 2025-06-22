@@ -1,28 +1,22 @@
-# Étape de construction
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Installer les dépendances système utiles à node-gyp (par précaution)
 RUN apk add --no-cache curl python3 make g++
 
-# Copier les fichiers de dépendances
 COPY package*.json ./
+RUN npm install && npm cache clean --force
 
-# ✅ Installer toutes les dépendances
-RUN npm ci --ignore-scripts && npm cache clean --force
+COPY . .
 
-# Étape d'exécution
 FROM node:20-alpine
 
 WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
-COPY . .
-COPY .env .env
+COPY --from=builder /app ./
 
-RUN chown -R node:node /app && \
-    apk add --no-cache curl
+RUN apk add --no-cache curl && chown -R node:node /app
 
 USER node
 
