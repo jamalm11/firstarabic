@@ -11,7 +11,7 @@ const disponibilitesController = require('./controllers/disponibilitesController
 const { eleveSchema } = require('./validators/eleveValidator');
 const { coursSchema } = require('./validators/coursValidator');
 const { profSchema } = require('./validators/profValidator');
-
+const { sendEmail } = require('./utils/email');
 const app = express();
 const PORT = 3001;
 
@@ -202,13 +202,41 @@ app.get('/prof/me', authenticateToken, async (req, res) => {
 });
 
 // === COURS ===
+
 app.post('/cours', authenticateToken, async (req, res) => {
   try {
     const { error: validationError } = coursSchema.validate(req.body);
     if (validationError) return res.status(400).json({ error: validationError.details[0].message });
+
     const { date, prof_id, eleve_id } = req.body;
-    const { data, error } = await req.supabase.from('cours').insert([{ date, prof_id, eleve_id, statut: 'confirme', created_by: req.user.id }]).select();
+    // Génération du lien Jitsi unique
+    const slug = `${prof_id}-${eleve_id}-${Date.now()}`;
+    const jitsi_url = `https://meet.jit.si/FirstArabic-${slug}`;
+
+    const { data, error } = await req.supabase.from('cours').insert([{
+      date,
+      prof_id,
+      eleve_id,
+      statut: 'confirme',
+      jitsi_url,
+      created_by: req.user.id
+    }]).select('*');
+
     if (error) throw error;
+
+    // ✅ Récupérer les emails
+    const { data: profData } = await req.supabase.from('profs').select('email').eq('id', prof_id).maybeSingle();
+    const { data: eleveData } = await req.supabase.from('eleves').select('email').eq('id', eleve_id).maybeSingle();
+
+    const emailBody = `
+      <p>Un nouveau cours a été programmé.</p>
+      <p>Date : ${date}</p>
+      <p>Lien Jitsi : <a href="${jitsi_url}">${jitsi_url}</a></p>
+    `;
+
+    if (profData?.email) await sendEmail(profData.email, "Nouveau cours", emailBody);
+    if (eleveData?.email) await sendEmail(eleveData.email, "Nouveau cours", emailBody);
+
     res.json({ success: true, cours: data[0] });
   } catch (e) {
     res.status(500).json({ error: "Erreur creation cours", details: e.message });
@@ -258,7 +286,7 @@ app.get('/cours/:id', authenticateToken, async (req, res) => {
     const { data, error } = await req.supabase
       .from('cours')
       .select(`
-        id, date, statut,
+        id, date, statut, jitsi_url,
         profs (nom),
         eleves (nom)
       `)
@@ -266,7 +294,6 @@ app.get('/cours/:id', authenticateToken, async (req, res) => {
       .maybeSingle();
 
     if (error) throw error;
-
     if (!data) return res.status(404).json({ error: "Cours introuvable" });
 
     res.json({
@@ -275,6 +302,7 @@ app.get('/cours/:id', authenticateToken, async (req, res) => {
         id: data.id,
         date: data.date,
         statut: data.statut,
+        jitsi_url: data.jitsi_url,
         prof_nom: data.profs?.nom || null,
         eleve_nom: data.eleves?.nom || null
       }
@@ -283,6 +311,7 @@ app.get('/cours/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Erreur récupération cours", details: e.message });
   }
 });
+
 
 //app.get('/cours/:id', authenticateToken, async (req, res) => {
 //  try {
@@ -318,6 +347,7 @@ app.delete('/cours/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Récupérer les emails
 
 // notifications
 
