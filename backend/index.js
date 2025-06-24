@@ -1,3 +1,6 @@
+
+// ========= IMPORTS =========
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -13,6 +16,9 @@ const { eleveSchema } = require('./validators/eleveValidator');
 const { coursSchema } = require('./validators/coursValidator');
 const { profSchema } = require('./validators/profValidator');
 const { sendEmail } = require('./utils/email');
+const ensureProfile = require('./middleware/ensureProfile');
+
+// ========= APP SETUP =========
 
 const app = express();
 const PORT = 3001;
@@ -20,21 +26,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-
-// app.get('/abonnements/all', authenticateToken, abonnementController.getAllAbonnements); // 🔒 Pour admin ou consultation
-// app.post('/abonnements/checkout', authenticateToken, abonnementController.createCheckoutSession); // 🚀 Démarre un paiement Stripeconst abonnementController = require('./controllers/abonnementController');
-// const paiementController = require('./controllers/paiementController');
-// const reservationsController = require('./controllers/reservationsController');
-// require('dotenv').config();
-// const express = require('express');
-// const { createClient } = require('@supabase/supabase-js');
-// const Joi = require('joi');
-// const { eleveSchema } = require('./validators/eleveValidator');
-// const app = express();
-// const PORT = 3001;
-
-// app.post("/stripe/webhook", express.raw({ type: 'application/json' }), paiementController.handleStripeWebhook);
-// app.use(express.json());
+// ========= SUPABASE CLIENT =========
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -43,11 +35,8 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
 });
 
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
 
+// ========= MIDDLEWARES =========
 const authenticateToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: "Token manquant" });
@@ -68,9 +57,15 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+   
+app.use(authenticateToken, ensureProfile);
 
 
-// ========== ROUTES ==========
+// ========== ROUTES ===================================
 
 app.get('/', (req, res) => {
   res.json({ status: "API FirstArabic operationnelle !" });
@@ -159,6 +154,33 @@ app.delete('/eleve/:id', authenticateToken, async (req, res) => {
 
 
 // === PROF ===
+// 🔒 Route admin : récupérer tous les profs, validés ou non
+app.get('/profs/all', authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await req.supabase.from('profs').select('*');
+    if (error) throw error;
+    res.json({ success: true, profs: data });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur recuperation profs admin", details: e.message });
+  }
+});
+
+// ✅ Route admin : valider un prof
+app.put('/prof/:id/valider', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await req.supabase
+      .from('profs')
+      .update({ is_validated: true })
+      .eq('id', id);
+    if (error) throw error;
+    res.json({ success: true, message: "Professeur validé" });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur validation prof", details: e.message });
+  }
+});
+
+
 app.post('/prof', authenticateToken, async (req, res) => {
   try {
     const { error: validationError } = profSchema.validate(req.body);

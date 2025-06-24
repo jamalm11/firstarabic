@@ -5,6 +5,7 @@ import axios from "axios";
 
 function Dashboard() {
   const [session, setSession] = useState(null);
+  const [token, setToken] = useState(null);
   const [profs, setProfs] = useState([]);
   const [selectedProf, setSelectedProf] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
@@ -12,21 +13,62 @@ function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const s = supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("🔐 Session récupérée :", session);
       setSession(session);
+      setToken(session?.access_token || null);
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("🔄 Auth state changed :", session);
       setSession(session);
+      setToken(session?.access_token || null);
     });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
-    // Charger la liste des profs disponibles
-    axios.get("http://localhost:3001/profs").then((res) => {
-      setProfs(res.data.profs || []);
-    });
-  }, []);
+    if (!token || !session) return;
+
+    const fetchAndCreateEleve = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/eleves", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.data.eleves || res.data.eleves.length === 0) {
+          await axios.post(
+            "http://localhost:3001/eleve",
+            { nom: session.user.email, email: session.user.email },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          console.log("✅ Élève créé automatiquement");
+        }
+      } catch (err) {
+        console.error("❌ Erreur création élève :", err);
+      }
+    };
+
+    fetchAndCreateEleve();
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    axios
+      .get("http://localhost:3001/profs", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setProfs(res.data.profs || []);
+      })
+      .catch((err) => {
+        console.error("❌ Erreur chargement profs :", err);
+      });
+  }, [token]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -40,9 +82,6 @@ function Dashboard() {
     }
 
     try {
-      const token = session?.access_token;
-      const user = session?.user;
-
       const eleveIdResponse = await axios.get("http://localhost:3001/eleves", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,7 +90,7 @@ function Dashboard() {
 
       const eleve = eleveIdResponse.data.eleves[0];
 
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:3001/cours",
         {
           prof_id: selectedProf,
@@ -65,9 +104,9 @@ function Dashboard() {
         }
       );
 
-      alert("Cours réservé avec succès !");
+      alert("🎉 Cours réservé avec succès !");
     } catch (error) {
-      console.error("Erreur réservation :", error);
+      console.error("❌ Erreur réservation :", error);
       alert("Erreur lors de la réservation");
     }
   };
@@ -91,10 +130,15 @@ function Dashboard() {
           <option value="">-- Sélectionner --</option>
           {profs.map((prof) => (
             <option key={prof.id} value={prof.id}>
-              {prof.nom} ({prof.specialite})
+              {prof.nom} ({prof.specialite || "spécialité non définie"})
             </option>
           ))}
         </select>
+        {profs.length === 0 && (
+          <p style={{ color: "red", marginTop: "0.5rem" }}>
+            Aucun professeur disponible pour l’instant.
+          </p>
+        )}
       </div>
 
       <div style={{ marginTop: "1rem" }}>
