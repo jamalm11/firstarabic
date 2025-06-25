@@ -1,4 +1,3 @@
-// src/pages/ProfDashboard.js
 import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +10,11 @@ function ProfDashboard() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      const role = session?.user?.user_metadata?.role;
+      if (role === "eleve") {
+        navigate("/dashboard"); // ✅ redirige les élèves
+        return;
+      }
       setSession(session);
       setToken(session?.access_token || null);
     });
@@ -18,13 +22,17 @@ function ProfDashboard() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      const role = session?.user?.user_metadata?.role;
+      if (role === "eleve") {
+        navigate("/dashboard");
+        return;
+      }
       setSession(session);
       setToken(session?.access_token || null);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
+  }, [navigate]);
   useEffect(() => {
     const createProfIfNeeded = async () => {
       if (!token || !session?.user?.email) return;
@@ -38,7 +46,7 @@ function ProfDashboard() {
         if (!exists) {
           await axios.post("http://localhost:3001/prof", {
             nom: session.user.email,
-            specialite: "non spécifiée", // ou récupérer depuis metadata
+            specialite: "non spécifiée",
           }, {
             headers: { Authorization: `Bearer ${token}` },
           });

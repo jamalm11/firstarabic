@@ -3,13 +3,9 @@ import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Dashboard() {
+function ProfDashboard() {
   const [session, setSession] = useState(null);
   const [token, setToken] = useState(null);
-  const [profs, setProfs] = useState([]);
-  const [selectedProf, setSelectedProf] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,85 +24,45 @@ function Dashboard() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // 🛡️ Rediriger tout utilisateur non professeur vers /
   useEffect(() => {
-    const fetchProfs = async () => {
-      try {
-        const res = await axios.get("http://localhost:3001/profs");
-        setProfs(res.data.profs || []);
-      } catch (err) {
-        console.error("Erreur récupération profs :", err);
-      }
-    };
-
-    fetchProfs();
-  }, []);
+    const role = session?.user?.user_metadata?.role;
+    if (role && role !== "prof") {
+      navigate("/");
+    }
+  }, [session, navigate]);
 
   useEffect(() => {
-    const createEleveIfNeeded = async () => {
+    const createProfIfNeeded = async () => {
       if (!token || !session?.user?.email) return;
 
       try {
-        const res = await axios.get("http://localhost:3001/eleves", {
+        const res = await axios.get("http://localhost:3001/profs", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!res.data.eleves || res.data.eleves.length === 0) {
-          await axios.post(
-            "http://localhost:3001/eleve",
-            { nom: session.user.email },
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          console.log("✅ Élève créé automatiquement");
+        const exists = res.data.profs?.some(p => p.nom === session.user.email);
+        if (!exists) {
+          await axios.post("http://localhost:3001/prof", {
+            nom: session.user.email,
+            specialite: "non spécifiée",
+          }, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          console.log("✅ Professeur créé automatiquement");
         }
       } catch (err) {
-        console.error("❌ Erreur création élève :", err);
+        console.error("❌ Erreur création prof :", err);
       }
     };
 
-    createEleveIfNeeded();
+    createProfIfNeeded();
   }, [token, session?.user?.email]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/login");
-  };
-
-  const handleReservation = async () => {
-    if (!selectedProf || !selectedDate) {
-      alert("Veuillez sélectionner un professeur et une date.");
-      return;
-    }
-
-    try {
-      const eleveIdResponse = await axios.get("http://localhost:3001/eleves", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const eleve = eleveIdResponse.data.eleves[0];
-
-      await axios.post(
-        "http://localhost:3001/cours",
-        {
-          prof_id: selectedProf,
-          eleve_id: eleve.id,
-          date: selectedDate,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      alert("🎉 Cours réservé avec succès !");
-    } catch (error) {
-      console.error("❌ Erreur réservation :", error);
-      alert("Erreur lors de la réservation");
-    }
+    navigate("/");
   };
 
   if (!session) {
@@ -115,43 +71,14 @@ function Dashboard() {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1>Bienvenue sur ton Dashboard</h1>
-      <p>Connecté en tant que : {session.user.email}</p>
-
-      <hr style={{ margin: "2rem 0" }} />
-
-      <h2>📅 Réserver un cours</h2>
-
-      <div>
-        <label>Choisir un professeur : </label>
-        <select value={selectedProf} onChange={(e) => setSelectedProf(e.target.value)}>
-          <option value="">-- Sélectionner --</option>
-          {profs.map((prof) => (
-            <option key={prof.id} value={prof.id}>
-              {prof.nom} ({prof.specialite})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div style={{ marginTop: "1rem" }}>
-        <label>Choisir une date : </label>
-        <input
-          type="datetime-local"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-      </div>
-
-      <button onClick={handleReservation} style={{ marginTop: "1rem" }}>
-        Réserver
+      <h1>🎓 Bienvenue dans l'espace professeur</h1>
+      <p>Connecté : {session.user.email}</p>
+      <p>Des fonctionnalités spécifiques aux profs seront ajoutées ici.</p>
+      <button onClick={handleLogout} style={{ marginTop: "2rem" }}>
+        Se déconnecter
       </button>
-
-      <hr style={{ margin: "2rem 0" }} />
-
-      <button onClick={handleLogout}>Se déconnecter</button>
     </div>
   );
 }
 
-export default Dashboard;
+export default ProfDashboard;
