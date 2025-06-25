@@ -14,13 +14,13 @@ function Dashboard() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("🔐 Session récupérée :", session);
       setSession(session);
       setToken(session?.access_token || null);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("🔄 Auth state changed :", session);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setToken(session?.access_token || null);
     });
@@ -29,9 +29,22 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (!token || !session) return;
+    const fetchProfs = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/profs");
+        setProfs(res.data.profs || []);
+      } catch (err) {
+        console.error("Erreur récupération profs :", err);
+      }
+    };
 
-    const fetchAndCreateEleve = async () => {
+    fetchProfs();
+  }, []);
+
+  useEffect(() => {
+    const createEleveIfNeeded = async () => {
+      if (!token || !session?.user?.email) return;
+
       try {
         const res = await axios.get("http://localhost:3001/eleves", {
           headers: { Authorization: `Bearer ${token}` },
@@ -40,7 +53,7 @@ function Dashboard() {
         if (!res.data.eleves || res.data.eleves.length === 0) {
           await axios.post(
             "http://localhost:3001/eleve",
-            { nom: session.user.email, email: session.user.email },
+            { nom: session.user.email },
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -52,23 +65,8 @@ function Dashboard() {
       }
     };
 
-    fetchAndCreateEleve();
-  }, [token]);
-
-  useEffect(() => {
-    if (!token) return;
-
-    axios
-      .get("http://localhost:3001/profs", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        setProfs(res.data.profs || []);
-      })
-      .catch((err) => {
-        console.error("❌ Erreur chargement profs :", err);
-      });
-  }, [token]);
+    createEleveIfNeeded();
+  }, [token, session?.user?.email]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -130,15 +128,10 @@ function Dashboard() {
           <option value="">-- Sélectionner --</option>
           {profs.map((prof) => (
             <option key={prof.id} value={prof.id}>
-              {prof.nom} ({prof.specialite || "spécialité non définie"})
+              {prof.nom} ({prof.specialite})
             </option>
           ))}
         </select>
-        {profs.length === 0 && (
-          <p style={{ color: "red", marginTop: "0.5rem" }}>
-            Aucun professeur disponible pour l’instant.
-          </p>
-        )}
       </div>
 
       <div style={{ marginTop: "1rem" }}>

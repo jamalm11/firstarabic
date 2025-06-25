@@ -1,0 +1,5 @@
+SUR LE fichier src/pages/ForgotPassword.js 
+on prod il faut changer 
+redirectTo: 'http://localhost:3000/reset-password',
+par 
+https://tondomaine.com/reset-password

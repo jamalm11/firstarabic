@@ -1,5 +1,6 @@
+// src/components/Login.js
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 function Login() {
@@ -12,46 +13,52 @@ function Login() {
       email,
       password,
     });
+
     if (error) {
       alert("Erreur de connexion : " + error.message);
     } else {
-      navigate("/dashboard");
-    }
-  };
+      const role = data.user?.user_metadata?.role || "eleve";
 
-  const handleSignup = async () => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (error) {
-      alert("Erreur d'inscription : " + error.message);
-    } else {
-      navigate("/dashboard");
+      if (role === "prof") {
+        navigate("/prof-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     }
   };
 
   return (
     <div style={{ textAlign: "center", marginTop: "100px" }}>
       <h2>Connexion à FirstArabic</h2>
+
       <input
         type="email"
-        placeholder="email"
+        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         style={{ display: "block", margin: "10px auto" }}
       />
+
       <input
         type="password"
-        placeholder="mot de passe"
+        placeholder="Mot de passe"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         style={{ display: "block", margin: "10px auto" }}
       />
-      <button onClick={handleLogin} style={{ marginRight: "10px" }}>
+
+      <button onClick={handleLogin} style={{ marginTop: "10px" }}>
         Se connecter
       </button>
-      <button onClick={handleSignup}>S'inscrire</button>
+
+      {/* 🔗 Lien vers mot de passe oublié */}
+      <p style={{ marginTop: "10px" }}>
+        <Link to="/forgot-password">Mot de passe oublié ?</Link>
+      </p>
+
+      <p style={{ marginTop: "20px" }}>
+        Pas encore de compte ? <Link to="/register">Créer un compte</Link>
+      </p>
     </div>
   );
 }

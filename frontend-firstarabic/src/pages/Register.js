@@ -6,7 +6,7 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nom, setNom] = useState("");
-  const [role, setRole] = useState("eleve"); // valeur par défaut
+  const [role, setRole] = useState("eleve");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -15,23 +15,40 @@ function Register() {
     setError("");
 
     try {
+      // ✅ Vérification email côté backend
+      const check = await fetch("http://localhost:3001/check-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const result = await check.json();
+
+      if (result.exists) {
+        alert("❌ Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.");
+        return;
+      }
+
+      // ✅ Inscription via Supabase si email libre
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: nom,
-            role: role, // 👈 très important
+            role: role,
           },
         },
       });
 
       if (error) throw error;
 
-      alert("📧 Un lien de confirmation a été envoyé à votre email.");
-      navigate("/login");
+      alert("📧 Un lien de confirmation a été envoyé à votre email. Veuillez l’activer avant de vous connecter.");
+      navigate("/");
     } catch (err) {
-      console.error(err);
+      console.error("Erreur d'inscription :", err);
       setError(err.message || "Erreur lors de l'inscription");
     }
   };
@@ -69,6 +86,10 @@ function Register() {
       </form>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <p style={{ marginTop: "20px" }}>
+        Vous avez déjà un compte ? <a href="/">Se connecter</a>
+      </p>
     </div>
   );
 }

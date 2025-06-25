@@ -17,7 +17,8 @@ const { coursSchema } = require('./validators/coursValidator');
 const { profSchema } = require('./validators/profValidator');
 const { sendEmail } = require('./utils/email');
 const ensureProfile = require('./middleware/ensureProfile');
-
+const supabaseAdmin = require("./supabaseAdminClient");
+const rateLimit = require("express-rate-limit");
 // ========= APP SETUP =========
 
 const app = express();
@@ -62,7 +63,6 @@ app.use((req, res, next) => {
   next();
 });
    
-app.use(authenticateToken, ensureProfile);
 
 
 // ========== ROUTES ===================================
@@ -505,7 +505,46 @@ app.get('/creneaux/disponibles', authenticateToken, async (req, res) => {
 });
 
 
-// Récupérer les emails
+// verifier  les emails lors de l'enregistrement pour detecter les emails deja utilise
+
+
+const emailCheckLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // max 5 requêtes
+  message: "Trop de tentatives. Réessayez plus tard.",
+});
+
+app.post("/check-email", emailCheckLimiter, async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: "Format d'email invalide" });
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+
+    if (error) {
+      console.error("❌ Supabase error:", error);
+      return res.status(500).json({ error: "Erreur Supabase" });
+    }
+
+    const exists = data.users.some((u) => u.email === email);
+    console.log(`🔍 Vérif email : ${email} → ${exists ? "EXISTE" : "DISPO"}`);
+
+    return res.json({ exists });
+  } catch (err) {
+    console.error("❌ Exception:", err);
+    return res.status(503).json({ error: "Service indisponible" });
+  }
+});
+
+
+
+
+
+
+
 
 // notifications
 

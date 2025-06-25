@@ -1,19 +1,25 @@
+// backend/middleware/ensureProfile.js
 const { createClient } = require('@supabase/supabase-js');
 
 const supabaseAdmin = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // ❗️ Utiliser la clé service_role ici
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 const ensureProfile = async (req, res, next) => {
   const user = req.user;
+  console.log("🧪 ensureProfile - req.user :", user);
+
   if (!user || !user.id) {
+    console.warn("🚫 Aucun utilisateur authentifié dans req.user");
     return res.status(401).json({ error: "Utilisateur non authentifié" });
   }
 
   const role = user.user_metadata?.role || "eleve";
   const nom = user.user_metadata?.full_name || user.email || "Utilisateur";
   const email = user.email || null;
+
+  console.log(`🔍 ensureProfile - Détection utilisateur : ${email} (rôle : ${role})`);
 
   try {
     if (role === "eleve") {
@@ -31,7 +37,7 @@ const ensureProfile = async (req, res, next) => {
         if (insertError) {
           console.error("❌ Erreur insertion élève :", insertError.message);
         } else {
-          console.log(`✅ Élève créé : ${nom} (${email})`);
+          console.log(`✅ Élève ajouté : ${nom} (${email})`);
         }
       }
     } else if (role === "prof") {
@@ -49,7 +55,7 @@ const ensureProfile = async (req, res, next) => {
         if (insertError) {
           console.error("❌ Erreur insertion prof :", insertError.message);
         } else {
-          console.log(`✅ Professeur créé : ${nom} (${email})`);
+          console.log(`✅ Prof ajouté : ${nom} (${email})`);
         }
       }
     }
