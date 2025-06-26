@@ -3,3 +3,37 @@ on prod il faut changer
 redirectTo: 'http://localhost:3000/reset-password',
 par 
 https://tondomaine.com/reset-password
+
+
+------------
+
+
+ici la liste des modules à completer :
+
+ Étapes possibles (tu choisis)
+
+1. 📆 Module Planning (Agenda global)
+	•	Voir tous les cours réservés par date
+	•	Vue calendrier pour les profs et élèves
+	•	Interface simple pour consulter les créneaux
+
+2. 🧾 Historique & facturation
+	•	Voir les réservations passées
+	•	Générer une facture simple par cours ou par mois
+
+3. 💬 Système de messagerie (optionnel)
+	•	Échange élève ↔ professeur après réservation
+	•	Simple boîte de réception
+
+4. 🎨 Frontend : amélioration visuelle
+	•	Affichage plus clair
+	•	Uniformiser les pages
+	•	Ajout de composants réutilisables (FormInput, MessageBox…)
+
+5. 🧪 Tests automatisés + CI
+	•	Ajout de tests unitaires pour l’auth
+	•	Mise en place de GitHub Actions ou autre CI pour valider les commits
+
+6. 🌍 Déploiement final
+	•	Backend + frontend hébergés (ex : Railway, Vercel, Supabase)
+	•	Configuration domaine et HTTPS
