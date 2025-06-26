@@ -42,3 +42,4 @@ coverage/
 # 🚫 Lockfiles autres que celui utilisé
 yarn.lock
 pnpm-lock.yaml
+node_modules/

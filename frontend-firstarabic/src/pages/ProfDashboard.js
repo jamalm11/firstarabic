@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 function ProfDashboard() {
@@ -12,7 +12,7 @@ function ProfDashboard() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const role = session?.user?.user_metadata?.role;
       if (role === "eleve") {
-        navigate("/dashboard"); // ✅ redirige les élèves
+        navigate("/dashboard"); // redirige les élèves
         return;
       }
       setSession(session);
@@ -33,6 +33,7 @@ function ProfDashboard() {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
   useEffect(() => {
     const createProfIfNeeded = async () => {
       if (!token || !session?.user?.email) return;
@@ -75,6 +76,8 @@ function ProfDashboard() {
       <h1>🎓 Bienvenue dans l'espace professeur</h1>
       <p>Connecté : {session.user.email}</p>
       <p>Des fonctionnalités spécifiques aux profs seront ajoutées ici.</p>
+      <Link to="/planning">📅 Voir mon planning</Link>
+      <br />
       <button onClick={handleLogout} style={{ marginTop: "2rem" }}>
         Se déconnecter
       </button>

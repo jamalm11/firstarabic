@@ -152,6 +152,33 @@ app.delete('/eleve/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Récupérer les cours d’un élève pour une date spécifique
+app.get('/cours/eleve/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date } = req.query;
+    if (!date) return res.status(400).json({ error: "Date requise au format YYYY-MM-DD" });
+
+    const { data, error } = await req.supabase
+      .from('cours')
+      .select(`
+        id, date, statut,
+        profs (nom),
+        eleves (nom)
+      `)
+      .eq('eleve_id', id)
+      .gte('date', `${date}T00:00:00`)
+      .lt('date', `${date}T23:59:59`)
+      .order('date', { ascending: true });
+
+    if (error) throw error;
+
+    res.json({ success: true, cours: data });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur récupération cours élève", details: e.message });
+  }
+});
+
 
 // === PROF ===
 // 🔒 Route admin : récupérer tous les profs, validés ou non
