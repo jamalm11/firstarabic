@@ -1,0 +1,67 @@
+Voici un résumé clair et structuré de ce que nous avons fait, étape par étape, pour tester l’authentification avec Supabase et effectuer un appel protégé avec curl.
+
+⸻
+
+✅ Objectif
+
+Tester une route protégée de ton backend (/eleves) avec un token d’authentification d’un élève récupéré depuis Supabase.
+
+⸻
+
+🧩 Étapes réalisées
+
+1. Création d’un utilisateur élève
+
+L’utilisateur eleve21@jxpomup.com a été inscrit et son mot de passe est 111111.
+
+⸻
+
+2. Récupération du token Supabase via curl
+
+Nous avons utilisé l’endpoint Supabase suivant pour récupérer un access_token :
+
+POST https://<PROJECT>.supabase.co/auth/v1/token?grant_type=password
+ Requête curl complète :
+curl -X POST 'https://aerhvxfzzpveykkedmej.supabase.co/auth/v1/token?grant_type=password' \
+  -H 'Content-Type: application/json' \
+  -H 'apikey: <SUPABASE_ANON_KEY>' \
+  -d '{
+    "email": "eleve21@jxpomup.com",
+    "password": "111111"
+  }'
+
+
+👉 Résultat : un access_token JWT est retourné dans la réponse JSON.
+
+⸻
+
+3. Appel d’une route protégée via curl
+
+Maintenant que tu as un access_token, tu peux appeler une route backend sécurisée.
+
+✅ Exemple : accéder à /eleves
+
+
+curl -X GET http://localhost:3001/eleves \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json"
+
+👉 Le backend valide le token (via supabase.auth.getUser(token)), et retourne les données liées à l’élève connecté (created_by = user.id).
+
+⸻
+
+📦 Résumé technique
+
+Étape
+Détail technique
+Authentification
+Supabase avec grant_type=password
+Récupération du token
+Via curl + API REST Supabase
+Appel backend sécurisé
+Token passé dans l’en-tête Authorization: Bearer <token>
+Middleware backend
+authenticateToken utilise supabase.auth.getUser()
+Filtrage des données
+Les routes filtrent les données en fonction de user.id (ex. : created_by)
+

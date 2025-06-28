@@ -253,6 +253,207 @@ app.get('/prof/me', authenticateToken, async (req, res) => {
   }
 });
 
+
+// ✅ Route corrigée : /profs-disponibles
+
+app.get("/profs-disponibles", authenticateToken, async (req, res) => {
+  // Debug: Log des headers et params initiaux
+  console.log("\n=== NOUVELLE REQUÊTE ===");
+  console.log("Headers:", {
+    authorization: req.headers.authorization?.slice(0, 20) + '...',
+    'content-type': req.headers['content-type']
+  });
+  console.log("Query Params:", req.query);
+
+  try {
+    const { date, period } = req.query;
+
+    // Debug: Validation des paramètres
+    if (!date || !period) {
+      console.error("❌ Paramètres manquants:", { date, period });
+      return res.status(400).json({ error: "Date et période requises" });
+    }
+
+    const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+    const dateObj = new Date(date);
+    
+    // Debug: Vérification du parsing de la date
+    if (isNaN(dateObj.getTime())) {
+      console.error("❌ Date invalide:", date);
+      return res.status(400).json({ error: "Format de date invalide" });
+    }
+
+    const jour = jours[dateObj.getDay()].toLowerCase();
+    console.log("📅 Date analysée:", {
+      input: date,
+      parsed: dateObj.toISOString(),
+      jour
+    });
+
+    // Configuration des plages horaires avec debug
+    let plageRecherche;
+    switch (period) {
+      case "morning":
+        plageRecherche = { start: "07:00:00", end: "11:59:59" };
+        break;
+      case "afternoon":
+        plageRecherche = { start: "12:00:00", end: "18:59:59" };
+        break;
+      case "evening":
+        plageRecherche = { start: "19:00:00", end: "23:59:59" };
+        break;
+      default:
+        console.error("❌ Période invalide:", period);
+        return res.status(400).json({ error: "Période invalide" });
+    }
+
+    console.log("🕒 Plage horaire configurée:", {
+      period,
+      plageRecherche
+    });
+
+    // Debug: Construction de la requête Supabase
+    console.log("\n⚡ Exécution requête Supabase...");
+    console.log("Query:", `
+      SELECT 
+        id, prof_id, jour, heure_debut, heure_fin,
+        profs(id, nom, specialite, is_validated)
+      FROM disponibilites
+      WHERE jour = '${jour}'
+      ORDER BY heure_debut ASC
+    `);
+
+    const { data: allDispos, error: fetchError, count } = await supabase
+      .from("disponibilites")
+      .select(`
+        id,
+        prof_id,
+        jour,
+        heure_debut,
+        heure_fin,
+        profs(id, nom, specialite, is_validated)
+      `, { count: 'exact' })
+      .eq("jour", jour)
+      .order("heure_debut", { ascending: true });
+
+    // Debug: Résultat de la requête
+    console.log("✅ Résultat requête:", {
+      count,
+      error: fetchError?.message,
+      firstItem: allDispos?.[0]
+    });
+
+    if (fetchError) {
+      console.error("❌ Erreur Supabase:", {
+        message: fetchError.message,
+        details: fetchError.details,
+        hint: fetchError.hint,
+        code: fetchError.code
+      });
+      throw fetchError;
+    }
+
+    console.log(`📊 ${allDispos.length} disponibilités trouvées`);
+
+    // Conversion et filtrage avec debug
+    console.log("\n🔍 Filtrage des disponibilités...");
+    const toSeconds = (timeStr) => {
+      if (!timeStr) return NaN;
+      const parts = timeStr.split(':').map(Number);
+      return parts[0] * 3600 + parts[1] * 60 + (parts[2] || 0);
+    };
+
+    const profsDisponibles = allDispos
+      .filter(dispo => {
+        // Debug: Vérification structure données
+        if (!dispo.profs) {
+          console.warn("⚠️ Disponibilité sans prof associé:", dispo.id);
+          return false;
+        }
+
+        if (!dispo.profs.is_validated) {
+          console.log(`➖ Prof non validé exclu: ${dispo.profs.id} - ${dispo.profs.nom}`);
+          return false;
+        }
+
+        const debutDispo = toSeconds(dispo.heure_debut);
+        const finDispo = toSeconds(dispo.heure_fin);
+        const debutRecherche = toSeconds(plageRecherche.start);
+        const finRecherche = toSeconds(plageRecherche.end);
+
+        // Debug des conversions
+        if (isNaN(debutDispo) || isNaN(finDispo)) {
+          console.error("⛔ Format de temps invalide:", {
+            id: dispo.id,
+            heure_debut: dispo.heure_debut,
+            heure_fin: dispo.heure_fin
+          });
+          return false;
+        }
+
+        const isAvailable = (
+          (debutDispo >= debutRecherche && debutDispo <= finRecherche) ||
+          (finDispo >= debutRecherche && finDispo <= finRecherche) ||
+          (debutDispo <= debutRecherche && finDispo >= finRecherche)
+        );
+
+        if (!isAvailable) {
+          console.log(`➖ Créneau non couvert: ${dispo.heure_debut}-${dispo.heure_fin} (recherche: ${plageRecherche.start}-${plageRecherche.end})`);
+        }
+
+        return isAvailable;
+      })
+      .map(dispo => {
+        console.log(`➕ Prof disponible: ${dispo.profs.nom} (${dispo.heure_debut}-${dispo.heure_fin})`);
+        return {
+          id: dispo.prof_id,
+          nom: dispo.profs.nom,
+          specialite: dispo.profs.specialite || "Général",
+          creneau: `${dispo.heure_debut} - ${dispo.heure_fin}`
+        };
+      });
+
+    console.log("\n🎯 Résultat final:", {
+      nbProfsDisponibles: profsDisponibles.length,
+      profs: profsDisponibles
+    });
+
+    res.json({
+      success: true,
+      profs: profsDisponibles,
+      debug: process.env.NODE_ENV === "development" ? {
+        params: { date, period, jour },
+        plageRecherche,
+        nbTotalDispos: allDispos.length,
+        requeteSupabase: {
+          table: "disponibilites",
+          filters: { jour },
+          joins: "profs"
+        }
+      } : undefined
+    });
+
+  } catch (e) {
+    console.error("\n❌ ERREUR GLOBALE:", {
+      message: e.message,
+      stack: e.stack,
+      ...(e.response?.data && { apiError: e.response.data })
+    });
+
+    res.status(500).json({
+      error: "Erreur serveur",
+      ...(process.env.NODE_ENV === "development" && {
+        details: e.message,
+        stack: e.stack
+      })
+    });
+  } finally {
+    console.log("\n=== FIN REQUÊTE ===\n");
+  }
+});
+
+
+ 
 // === COURS ===
 
 app.post('/cours', authenticateToken, async (req, res) => {
