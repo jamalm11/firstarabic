@@ -1,0 +1,97 @@
+
+
+
+qqq
+
+
+  ff// backend/routes/notificationsRoutes.js
+const express = require('express');
+const router = express.Router();
+const { notificationSchema, updateNotificationSchema } = require('../validators/notificationValidator');
+const authenticateToken = require('../middleware/authenticateToken');
+const supabase = require('../supabaseClient');
+
+// 📥 Créer une notification
+router.post('/', authenticateToken, async (req, res) => {
+  const { error: validationError } = notificationSchema.validate(req.body);
+  if (validationError) {
+    return res.status(400).json({ error: "Données invalides", details: validationError.details[0].message });
+  }
+
+  const { message, lue, type } = req.body;
+  const created_by = req.user.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert([{ message, lue: lue || false, type: type || 'info', created_by }])
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    console.log("✅ Notification créée:", data);
+    res.json({ success: true, notification: data });
+  } catch (e) {
+    console.error("❌ Erreur création notif:", e.message);
+    res.status(500).json({ error: "Erreur création notification", details: e.message });
+  }
+});
+
+// 📋 Récupérer ses notifications
+router.get('/', authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('created_by', req.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json({ success: true, notifications: data });
+  } catch (e) {
+    console.error("❌ Erreur lecture notifs:", e.message);
+    res.status(500).json({ error: "Erreur lecture notifications", details: e.message });
+  }
+});
+
+// ✅ Marquer une notification comme lue
+router.patch('/:id/lue', authenticateToken, async (req, res) => {
+  const notifId = req.params.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .update({ lue: true })
+      .eq('id', notifId)
+      .eq('created_by', req.user.id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    res.json({ success: true, notification: data });
+  } catch (e) {
+    console.error("❌ Erreur maj lue:", e.message);
+    res.status(500).json({ error: "Erreur maj notification", details: e.message });
+  }
+});
+
+// 🗑️ Supprimer une notification
+router.delete('/:id', authenticateToken, async (req, res) => {
+  const notifId = req.params.id;
+
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notifId)
+      .eq('created_by', req.user.id);
+
+    if (error) throw error;
+    res.json({ success: true, message: "Notification supprimée" });
+  } catch (e) {
+    console.error("❌ Erreur suppression notif:", e.message);
+    res.status(500).json({ error: "Erreur suppression notification", details: e.message });
+  }
+});
+
+module.exports = router;

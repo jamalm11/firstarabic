@@ -1,0 +1,83 @@
+// backend/testRoutes.js
+const fetch = require('node-fetch');
+require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
+
+const API_URL = 'http://localhost:3001';
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+// Modifier ici selon le rôle à tester :
+const testUser = {
+  email: "harzoyakko@gufum.com", // ou "prof1@zvvzuv.com"
+  password: "111111"
+};
+
+(async () => {
+  try {
+    console.log("🔐 Authentification en cours...");
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: testUser.email,
+      password: testUser.password,
+    });
+
+    if (error) throw error;
+    const token = data.session.access_token;
+    console.log("✅ Token récupéré :", token.slice(0, 30) + '...');
+
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    };
+
+    // Récupération du rôle pour affichage
+    const role = data.user.user_metadata?.role;
+    console.log("👤 Rôle détecté :", role || "inconnu");
+
+    const routesToTest = [
+      { method: "GET", path: "/eleves" },
+      { method: "GET", path: "/profs" },
+      { method: "GET", path: "/cours" },
+      { method: "GET", path: "/notifications" },
+      { method: "GET", path: "/disponibilites" },
+      { method: "GET", path: "/reservations" },
+      { method: "GET", path: "/planning" },
+    ];
+
+    for (const route of routesToTest) {
+      console.log(`\n➡️  ${route.method} ${route.path}`);
+      const response = await fetch(`${API_URL}${route.path}`, {
+        method: route.method,
+        headers
+      });
+
+      const json = await response.json();
+      if (response.ok) {
+        console.log("✅ Succès:", json);
+      } else {
+        console.log("❌ Erreur:", json);
+      }
+    }
+
+    // 🔔 Test POST /notifications
+    console.log(`\n➡️  POST /notifications`);
+    const postNotifRes = await fetch(`${API_URL}/notifications`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        titre: "Bienvenue !",
+        message: `Notification test envoyée par ${testUser.email}`
+      })
+    });
+
+    const notifJson = await postNotifRes.json();
+    if (postNotifRes.ok) {
+      console.log("✅ Notification créée:", notifJson);
+    } else {
+      console.log("❌ Erreur création notif:", notifJson);
+    }
+
+  } catch (e) {
+    console.error("❌ Échec global :", e.message);
+  }
+})();

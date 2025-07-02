@@ -1,8 +1,14 @@
 const Joi = require('joi');
 
-// Schéma de validation pour création/mise à jour d'un élève
-const eleveSchema = Joi.object({
-  nom: Joi.string().min(2).max(100).required()
+const eleveInputSchema = Joi.object({
+  nom: Joi.string().min(2).max(100).required(),
+  email: Joi.string().email().optional()
 });
 
-module.exports = { eleveSchema };
+const eleveSchema = Joi.object({
+  nom: Joi.string().required(),
+  email: Joi.string().email().optional(),
+  created_by: Joi.string().uuid().required()
+});
+
+module.exports = { eleveSchema, eleveInputSchema };

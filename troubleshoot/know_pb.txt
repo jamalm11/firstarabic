@@ -1,0 +1,78 @@
+# 🛠️ Résolution du bug `created_by` manquant lors de l'insertion d'un élève
+
+## 🔍 Contexte
+
+Lorsqu’un nouvel élève s’inscrivait via le frontend, l’API backend renvoyait une erreur 400 (`"created_by is required"`), même si le champ `created_by` était bien généré côté serveur (`req.user.id`). Cela bloquait l’insertion automatique de l’élève dans la table `eleves`.
+
+---
+
+## 🧩 Cause identifiée
+
+Le fichier `eleveValidator.js` utilisait un schéma Joi comme suit :
+
+```js
+const eleveSchema = Joi.object({
+  nom: Joi.string().required(),
+  email: Joi.string().email().optional(),
+  created_by: Joi.string().uuid().required()
+});
+```
+
+Mais dans la route `POST /eleves`, la validation se faisait par défaut sur **tout** `req.body` :
+
+```js
+const { error } = eleveSchema.validate(req.body);
+```
+
+Or, `created_by` **n’est jamais envoyé par le frontend** (il est injecté côté serveur via le token). La validation échouait donc systématiquement.
+
+---
+
+## ✅ Solution retenue
+
+On ne modifie **pas** le schéma (pour qu’il reste réutilisable ailleurs), mais on limite explicitement les champs validés :
+
+```js
+const { error: validationError } = eleveSchema.validate({
+  nom: req.body.nom,
+  email: req.body.email
+});
+```
+
+Ainsi :
+- ✅ Seuls les champs `nom` et `email` sont validés (fournis par l’utilisateur)
+- ✅ Le champ `created_by` est injecté de manière sécurisée côté backend
+- ✅ Le schéma reste valide pour d’autres cas plus complets si besoin
+
+---
+
+## ✉️ Bonus : Envoi de l’email de bienvenue
+
+Une fois l’élève créé, un email HTML de bienvenue est envoyé :
+
+```js
+await sendEmail(
+  email,
+  "Bienvenue sur FirstArabic ! 🌟",
+  `
+    <h2>Bienvenue ${nom} !</h2>
+    <p>Votre compte a été créé avec succès. Vous pouvez maintenant réserver des cours sur notre plateforme.</p>
+    <p><a href="https://firstarabic.com">Accéder à la plateforme</a></p>
+  `
+);
+```
+
+---
+
+## 📌 Résultat attendu
+
+- ✅ L’élève est bien inséré en base avec `created_by`
+- ✅ Aucun champ sensible n’est validé côté frontend
+- ✅ L'email est bien envoyé
+- ✅ Le système reste extensible et sécurisé
+
+---
+
+## 🧠 Remarque importante
+
+Si un jour vous validez un schéma complet incluant `created_by`, assurez-vous que ce champ est bien **inclus manuellement** dans l’objet validé. Ne jamais le laisser dépendre du frontend.

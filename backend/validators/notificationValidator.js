@@ -1,18 +1,19 @@
+
 // backend/validators/notificationValidator.js
 
 const Joi = require('joi');
 
 const notificationSchema = Joi.object({
-  titre: Joi.string().min(3).max(100).required(),
   message: Joi.string().min(3).max(500).required(),
-  lu: Joi.boolean().optional() // généralement false à la création
+  type: Joi.string().valid('info', 'alerte', 'erreur').default('info'),
+  lue: Joi.boolean().optional() // généralement false à la création
 });
 
 const updateNotificationSchema = Joi.object({
-  titre: Joi.string().min(3).max(100),
   message: Joi.string().min(3).max(500),
-  lu: Joi.boolean()
-});
+  type: Joi.string().valid('info', 'alerte', 'erreur'),
+  lue: Joi.boolean()
+}).min(1); // Au moins un champ obligatoire pour update
 
 module.exports = {
   notificationSchema,

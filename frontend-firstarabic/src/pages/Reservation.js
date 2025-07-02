@@ -22,21 +22,21 @@ function Reservation() {
   // 1. Récupération session Supabase
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        alert("⛔ Session expirée. Merci de vous reconnecter.");
+        navigate("/");
+        return;
+      }
       setSession(session);
       setToken(session?.access_token || null);
+      console.log("🔐 Session récupérée:", session);
     });
-  }, []);
+  }, [navigate]);
 
   // 2. Récupération du professeur
   useEffect(() => {
     const fetchProf = async () => {
-      if (!token || !profId) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
+      if (!token || !profId) return;
 
       try {
         const res = await axios.get("http://localhost:3001/profs", {
@@ -46,10 +46,10 @@ function Reservation() {
         const found = res.data?.profs?.find((p) => p.id === profId);
         if (!found) {
           setError("Professeur introuvable");
-          return;
+        } else {
+          setProf(found);
+          console.log("👨‍🏫 Professeur trouvé :", found);
         }
-
-        setProf(found);
       } catch (err) {
         console.error("❌ Erreur récupération prof :", err);
         setError("Erreur lors du chargement du professeur");
@@ -64,38 +64,50 @@ function Reservation() {
   // 3. Envoi de la réservation
   const handleReservation = async () => {
     try {
+      if (!token) {
+        alert("⛔ Session expirée. Veuillez vous reconnecter.");
+        navigate("/");
+        return;
+      }
+
       const fullDate = new Date(selectedDate);
       const [hours, minutes] = selectedTime.split(":").map(Number);
       fullDate.setHours(hours, minutes, 0);
+
+      console.log("📅 Créneau choisi :", fullDate.toISOString(), selectedTime);
+      console.log("🔐 Token utilisé :", token);
 
       const { data: eleveData } = await axios.get("http://localhost:3001/eleves", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const eleve_id = eleveData.eleves[0]?.id;
+      console.log("👤 Données élève récupérées :", eleveData);
+
+      const eleve_id = eleveData.eleves?.[0]?.id;
       if (!eleve_id) throw new Error("Élève non trouvé");
 
-      await axios.post(
-        "http://localhost:3001/cours",
-        {
-          date: fullDate.toISOString(),
-          prof_id: profId,
-          eleve_id,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const payload = {
+        date: fullDate.toISOString(),
+        prof_id: profId,
+        eleve_id,
+      };
 
+      console.log("📨 Envoi réservation :", payload);
+
+      const res = await axios.post("http://localhost:3001/cours", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("✅ Réservation réussie :", res.data);
       alert("✅ Cours réservé avec succès !");
       navigate("/dashboard");
     } catch (err) {
-      console.error("❌ Erreur réservation :", err);
+      console.error("❌ Erreur lors de la réservation :", err?.response?.data || err.message);
       alert("Erreur lors de la réservation");
     }
   };
 
-  // 4. Affichage conditionnel (les hooks sont déjà appelés donc c'est OK ici)
+  // 4. Affichage conditionnel
   if (!profId) {
     return (
       <div style={{ padding: "2rem" }}>
