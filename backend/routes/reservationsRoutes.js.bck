@@ -1,0 +1,159 @@
+// backend/routes/coursRoutes.js
+
+const express = require("express");
+const router = express.Router();
+const supabaseAdmin = require("../supabaseClient");
+const authenticateToken = require("../middleware/authenticateToken");
+
+// ✅ GET /cours : récupérer les cours liés à l'utilisateur
+router.get("/", authenticateToken, async (req, res) => {
+  const user = req.user;
+  console.log(`📚 [GET /cours] Requête de ${user.email} (${user.id})`);
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("cours")
+      .select("*")
+      .or(`eleve_id.eq.${user.id},prof_id.eq.${user.id}`);
+
+    if (error) {
+      console.error("❌ Erreur récupération cours :", error);
+      return res.status(500).json({ error: "Erreur récupération cours" });
+    }
+
+    console.log(`📦 ${data.length} cours récupérés`);
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Erreur serveur GET /cours :", err.message);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+
+// ✅ POST /cours : créer un nouveau cours
+
+// ✅ POST /cours : créer un nouveau cours
+router.post("/", authenticateToken, async (req, res) => {
+  console.log("✅ [API] POST /cours appelée");
+
+  const { date, prof_id, eleve_id } = req.body;
+  const user_id = req.user.id;
+  const user_email = req.user.email;
+
+  console.log("🔐 Utilisateur authentifié :", user_email, `(${user_id})`);
+
+  try {
+    // Vérifie que l’élève appartient à cet utilisateur
+    const { data: eleveData, error: eleveError } = await supabaseAdmin
+      .from("eleves")
+      .select("*")
+      .eq("id", eleve_id)
+      .eq("created_by", user_id)
+      .maybeSingle();
+
+    if (eleveError || !eleveData) {
+      console.warn("🚫 Élève non trouvé ou non accessible");
+      console.log("🔍 Résultat Supabase :", { eleveError, eleveData });
+      return res.status(403).json({ error: "Élève non autorisé" });
+    }
+
+    // ✅ Générer un lien Jitsi aléatoire
+    const jitsi_url = `https://meet.jit.si/${crypto.randomUUID()}`;
+
+    // 🔍 Debug : afficher les données à insérer
+    console.log("📥 Données à insérer dans cours :", {
+      date,
+      prof_id,
+      eleve_id,
+      jitsi_url,
+      statut: 'prévu',
+      created_by: user_id
+    });
+    console.log("🔍 Requête vérifiée avec eleve_id =", eleve_id, "et user.id =", user.id);
+    const { data: coursData, error: insertError } = await supabaseAdmin
+      .from("cours")
+      .insert([
+        {
+          date,
+          prof_id,
+          eleve_id,
+          jitsi_url,
+          statut: 'prévu',
+          created_by: user_id
+        }
+      ])
+      .select()
+      .single();
+
+    if (insertError || !coursData) {
+      console.error("❌ Insertion échouée :", insertError || "Aucune donnée insérée");
+      return res.status(500).json({ error: "Erreur création cours ou réponse vide" });
+    }
+
+    console.log("✅ Nouveau cours inséré :", coursData);
+    res.status(201).json(coursData);
+  } catch (err) {
+    console.error("❌ Erreur serveur POST /cours :", err.message);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+
+
+// ✅ PUT /cours/:id : modifier un cours si créé par utilisateur
+router.put("/:id", authenticateToken, async (req, res) => {
+  const coursId = req.params.id;
+  const user_id = req.user.id;
+  const updates = req.body;
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("cours")
+      .update(updates)
+      .eq("id", coursId)
+      .eq("created_by", user_id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      console.warn("🚫 Cours non trouvé ou non modifiable");
+      return res.status(403).json({ error: "Cours non autorisé ou inexistant" });
+    }
+
+    console.log("✏️ Cours modifié :", data);
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Erreur PUT /cours :", err.message);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+
+// ✅ DELETE /cours/:id : supprimer un cours si créé par utilisateur
+router.delete("/:id", authenticateToken, async (req, res) => {
+  const coursId = req.params.id;
+  const user_id = req.user.id;
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("cours")
+      .delete()
+      .eq("id", coursId)
+      .eq("created_by", user_id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      console.warn("🚫 Cours non trouvé ou non supprimable");
+      return res.status(403).json({ error: "Cours non autorisé ou inexistant" });
+    }
+
+    console.log("🗑️ Cours supprimé :", data);
+    res.json({ message: "Cours supprimé", cours: data });
+  } catch (err) {
+    console.error("❌ Erreur DELETE /cours :", err.message);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+module.exports = router;

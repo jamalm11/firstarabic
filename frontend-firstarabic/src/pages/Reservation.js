@@ -21,37 +21,47 @@ function Reservation() {
 
   // 1. Récupération session Supabase
   useEffect(() => {
+    console.log("🔍 [Etape 1] Tentative de récupération session Supabase...");
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
+        console.warn("⛔ [Etape 1] Session introuvable, redirection.");
         alert("⛔ Session expirée. Merci de vous reconnecter.");
         navigate("/");
         return;
       }
       setSession(session);
-      setToken(session?.access_token || null);
-      console.log("🔐 Session récupérée:", session);
+      const access_token = session?.access_token || null;
+      setToken(access_token);
+      console.log("✅ [Etape 1] Session récupérée :", session);
+      console.log("🔑 [Etape 1] Access Token :", access_token);
     });
   }, [navigate]);
 
   // 2. Récupération du professeur
   useEffect(() => {
     const fetchProf = async () => {
-      if (!token || !profId) return;
+      if (!token || !profId) {
+        console.warn("⏳ [Etape 2] Token ou profId manquant, attente...");
+        return;
+      }
 
+      console.log("🔍 [Etape 2] Récupération des professeurs...");
       try {
         const res = await axios.get("http://localhost:3001/profs", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        console.log("✅ [Etape 2] Liste profs reçue :", res.data);
         const found = res.data?.profs?.find((p) => p.id === profId);
         if (!found) {
+          console.warn("❌ [Etape 2] Professeur introuvable dans la liste !");
           setError("Professeur introuvable");
         } else {
           setProf(found);
-          console.log("👨‍🏫 Professeur trouvé :", found);
+          console.log("👨‍🏫 [Etape 2] Professeur trouvé :", found);
         }
       } catch (err) {
-        console.error("❌ Erreur récupération prof :", err);
+        console.error("❌ [Etape 2] Erreur récupération prof :", err);
         setError("Erreur lors du chargement du professeur");
       } finally {
         setLoading(false);
@@ -63,8 +73,10 @@ function Reservation() {
 
   // 3. Envoi de la réservation
   const handleReservation = async () => {
+    console.log("🟡 [Etape 3] Début de la réservation...");
     try {
       if (!token) {
+        console.warn("⛔ [Etape 3] Token invalide");
         alert("⛔ Session expirée. Veuillez vous reconnecter.");
         navigate("/");
         return;
@@ -74,17 +86,21 @@ function Reservation() {
       const [hours, minutes] = selectedTime.split(":").map(Number);
       fullDate.setHours(hours, minutes, 0);
 
-      console.log("📅 Créneau choisi :", fullDate.toISOString(), selectedTime);
-      console.log("🔐 Token utilisé :", token);
+      console.log("📆 [Etape 3] Créneau choisi :", fullDate.toISOString(), "à", selectedTime);
 
+      // Récupérer l'élève connecté
+      console.log("🔍 [Etape 3] Récupération des données élève...");
       const { data: eleveData } = await axios.get("http://localhost:3001/eleves", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("👤 Données élève récupérées :", eleveData);
+      console.log("✅ [Etape 3] Données élève reçues :", eleveData);
 
       const eleve_id = eleveData.eleves?.[0]?.id;
-      if (!eleve_id) throw new Error("Élève non trouvé");
+      if (!eleve_id) {
+        console.error("❌ [Etape 3] Élève introuvable !");
+        throw new Error("Élève non trouvé");
+      }
 
       const payload = {
         date: fullDate.toISOString(),
@@ -92,23 +108,24 @@ function Reservation() {
         eleve_id,
       };
 
-      console.log("📨 Envoi réservation :", payload);
+      console.log("📨 [Etape 3] Payload envoyé au backend :", payload);
 
       const res = await axios.post("http://localhost:3001/cours", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("✅ Réservation réussie :", res.data);
+      console.log("✅ [Etape 3] Réservation réussie :", res.data);
       alert("✅ Cours réservé avec succès !");
       navigate("/dashboard");
     } catch (err) {
-      console.error("❌ Erreur lors de la réservation :", err?.response?.data || err.message);
+      console.error("❌ [Etape 3] Erreur lors de la réservation :", err?.response?.data || err.message);
       alert("Erreur lors de la réservation");
     }
   };
 
   // 4. Affichage conditionnel
   if (!profId) {
+    console.warn("⚠️ [Etape 4] Aucun prof_id trouvé dans l'URL");
     return (
       <div style={{ padding: "2rem" }}>
         <p>⚠️ Aucun professeur sélectionné.</p>

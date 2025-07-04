@@ -54,17 +54,12 @@ router.post("/", async (req, res) => {
       return res.status(403).json({ message: "Élève non autorisé ou inexistant" });
     }
 
-    // 🔗 Génération du lien Jitsi
-    const jitsiRoom = `firstarabic-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    const lien_jitsi = `https://meet.jit.si/${jitsiRoom}`;
-    console.log("🔗 Lien Jitsi généré :", lien_jitsi);
-
     console.log("✅ [Sécurité] Élève autorisé. Passage à l'insertion du cours...");
-    console.log("📤 Données insérées:", { date, prof_id, eleve_id, lien_jitsi });
+    console.log("📤 Données insérées:", { date, prof_id, eleve_id });
 
     const { error: insertError } = await supabase
       .from("cours")
-      .insert([{ date, prof_id, eleve_id, jitsi_url: lien_jitsi }]);
+      .insert([{ date, prof_id, eleve_id }]);
 
     if (insertError) {
       console.log("❌ [DB] Erreur insertion cours:", insertError.message);
@@ -72,11 +67,10 @@ router.post("/", async (req, res) => {
     }
 
     console.log("✅ [Succès] Cours inséré avec succès ✅");
-    return res.status(200).json({ message: "Cours réservé avec succès", lien_jitsi });
+    return res.status(200).json({ message: "Cours réservé avec succès" });
   } catch (err) {
     console.error("❌ [Exception] Erreur inattendue dans POST /cours:", err);
     return res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
 module.exports = router;

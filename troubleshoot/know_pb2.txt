@@ -1,0 +1,27 @@
+// ✅ Problème rencontré :
+// TypeError: Router.use() requires a middleware function but got a Object
+// 👉 Cela survient lors du lancement du backend après modification de coursRoutes.js
+
+// 📌 Cause :
+// Le fichier backend/routes/coursRoutes.js ne se terminait pas par un export du router.
+// Express attend une fonction middleware (ici un router), mais reçoit undefined ou un objet vide.
+
+// ❌ Exemple de fin de fichier incorrect (manquait l’export) :
+// ... routes définies ici ...
+// <-- rien ici, donc Express reçoit un objet vide
+
+// ✅ Solution appliquée :
+// Ajout à la fin du fichier :
+module.exports = router;
+
+// 📁 Fichier corrigé : backend/routes/coursRoutes.js
+
+// 🔎 Résultat après test :
+// - Le backend démarre sans erreur
+// - La route POST /cours fonctionne
+// - L’insertion dans la table "cours" a bien été effectuée (réservation confirmée)
+
+// 🧠 À retenir :
+// - Toujours terminer les fichiers de routes Express par : module.exports = router;
+// - En cas d’erreur "Router.use() requires a middleware function", vérifier les exports
+// - Ajouter des logs dans chaque fichier de route pour faciliter le debug
