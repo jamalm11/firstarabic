@@ -71,7 +71,7 @@ function Reservation() {
     fetchProf();
   }, [token, profId]);
 
-  // 3. Envoi de la réservation
+  // 3. Envoi de la réservation avec correction du fuseau horaire
   const handleReservation = async () => {
     console.log("🟡 [Etape 3] Début de la réservation...");
     try {
@@ -82,11 +82,29 @@ function Reservation() {
         return;
       }
 
-      const fullDate = new Date(selectedDate);
+      // 🆕 FIX: Construction correcte de la date en heure locale
       const [hours, minutes] = selectedTime.split(":").map(Number);
-      fullDate.setHours(hours, minutes, 0);
+      
+      // Créer une nouvelle date avec l'année, mois, jour de selectedDate
+      // mais avec l'heure/minute choisie
+      const fullDate = new Date(selectedDate);
+      fullDate.setHours(hours, minutes, 0, 0);
 
-      console.log("📆 [Etape 3] Créneau choisi :", fullDate.toISOString(), "à", selectedTime);
+      // 🚨 IMPORTANT: Garder l'heure locale, ne pas convertir en UTC
+      // On va envoyer la date en format local
+      const year = fullDate.getFullYear();
+      const month = String(fullDate.getMonth() + 1).padStart(2, '0');
+      const day = String(fullDate.getDate()).padStart(2, '0');
+      const hour = String(hours).padStart(2, '0');
+      const minute = String(minutes).padStart(2, '0');
+      
+      // Format: YYYY-MM-DDTHH:MM:SS (sans Z pour éviter la conversion UTC)
+      const localDateString = `${year}-${month}-${day}T${hour}:${minute}:00`;
+
+      console.log("📆 [Etape 3] Date sélectionnée :", selectedDate);
+      console.log("🕐 [Etape 3] Heure sélectionnée :", selectedTime);
+      console.log("📅 [Etape 3] Date complète construite :", fullDate);
+      console.log("📨 [Etape 3] Date envoyée au backend :", localDateString);
 
       // Récupérer l'élève connecté
       console.log("🔍 [Etape 3] Récupération des données élève...");
@@ -103,7 +121,7 @@ function Reservation() {
       }
 
       const payload = {
-        date: fullDate.toISOString(),
+        date: localDateString, // 🆕 Utiliser la date locale au lieu de ISO
         prof_id: profId,
         eleve_id,
       };
@@ -119,7 +137,16 @@ function Reservation() {
       navigate("/dashboard");
     } catch (err) {
       console.error("❌ [Etape 3] Erreur lors de la réservation :", err?.response?.data || err.message);
-      alert("Erreur lors de la réservation");
+      
+      // 🆕 Affichage d'un message d'erreur plus informatif
+      const errorMessage = err?.response?.data?.message || "Erreur lors de la réservation";
+      const disponibilites = err?.response?.data?.disponibilites_du_jour;
+      
+      if (disponibilites) {
+        alert(`❌ ${errorMessage}\n\nCréneaux disponibles: ${disponibilites.join(', ')}`);
+      } else {
+        alert(`❌ ${errorMessage}`);
+      }
     }
   };
 
@@ -130,7 +157,7 @@ function Reservation() {
       <div style={{ padding: "2rem" }}>
         <p>⚠️ Aucun professeur sélectionné.</p>
         <p>
-          Veuillez d’abord <Link to="/professeurs">choisir un professeur</Link>.
+          Veuillez d'abord <Link to="/professeurs">choisir un professeur</Link>.
         </p>
       </div>
     );
@@ -145,21 +172,32 @@ function Reservation() {
     <div style={{ padding: "2rem" }}>
       <h2>📅 Réserver un cours avec {prof.nom}</h2>
 
-      <label>Date :</label>
-      <DatePicker selected={selectedDate} onChange={setSelectedDate} />
+      <div style={{ marginBottom: "1rem" }}>
+        <label>Date :</label>
+        <DatePicker 
+          selected={selectedDate} 
+          onChange={setSelectedDate}
+          dateFormat="dd/MM/yyyy"
+          minDate={new Date()} // Empêche de sélectionner une date passée
+        />
+      </div>
 
-      <br />
-      <label>Heure :</label>
-      <select value={selectedTime} onChange={(e) => setSelectedTime(e.target.value)}>
-        {["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"].map((h) => (
-          <option key={h} value={h}>{h}</option>
-        ))}
-      </select>
+      <div style={{ marginBottom: "1rem" }}>
+        <label>Heure :</label>
+        <select value={selectedTime} onChange={(e) => setSelectedTime(e.target.value)}>
+          {["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"].map((h) => (
+            <option key={h} value={h}>{h}</option>
+          ))}
+        </select>
+      </div>
 
-      <br />
-      <button onClick={handleReservation} style={{ marginTop: "1rem" }}>
+      <button onClick={handleReservation} style={{ marginTop: "1rem", padding: "0.5rem 1rem" }}>
         Réserver ce créneau
       </button>
+
+      <div style={{ marginTop: "1rem" }}>
+        <Link to="/professeurs">← Retour aux professeurs</Link>
+      </div>
     </div>
   );
 }
