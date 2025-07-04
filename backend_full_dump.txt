@@ -1,0 +1,1009 @@
+
+
+Voici la liste exhaustive des fichiers typiquement utilisés dans ton projet backend Node.js avec Supabase, en te basant sur tout ce que tu m’as partagé jusqu’ici (structure validée, routes modularisées, authentification, validation, Supabase, cours, réservations, paiements, notifications, etc.).
+📁 Structure complète du dossier backend/
+
+backend/
+├── index.js                        # Point d’entrée principal du serveur Express
+├── supabaseClient.js              # Client Supabase côté utilisateur (avec token)
+├── supabaseAdminClient.js         # Client Supabase avec service_role (admin)
+├── middleware/
+│   └── authenticateToken.js       # Middleware pour valider le JWT Supabase
+├── validators/
+│   ├── coursValidator.js          # Schéma Joi pour valider un cours
+│   ├── eleveValidator.js          # Schéma Joi pour élève
+│   ├── profValidator.js           # Schéma Joi pour professeur
+│   └── ...                        # Autres validateurs (abonnement, disponibilité…)
+├── routes/
+│   ├── abonnementsRoutes.js       # Routes Stripe pour abonnements + paiement
+│   ├── coursRoutes.js             # Routes pour créer/lister les cours
+│   ├── elevesRoutes.js            # Routes pour gérer les élèves
+│   ├── profsRoutes.js             # Routes pour gérer les profs
+│   ├── disponibilitesRoutes.js    # Routes CRUD des disponibilités des profs
+│   ├── planningRoutes.js          # Routes pour l’agenda/planning
+│   ├── reservationsRoutes.js      # Routes pour les réservations
+│   ├── notificationsRoutes.js     # Routes pour l'envoi de mails, alertes
+│   └── stripeWebhook.js           # Webhook Stripe (/stripe/webhook)
+├── utils/
+│   ├── email.js                   # Fonction `sendEmail` via Nodemailer
+│   └── ...                        # Autres helpers éventuels (Jitsi, logs…)
+├── .env                           # Fichier d’environnement (SUPABASE_URL, KEY…)
+├── package.json                   # Dépendances et scripts npm
+└── README.md                      # (Optionnel) Documentation technique
+
+
+📌 Résumé des composants
+
+📦 Catégorie
+Fichiers principaux
+Entrée serveur
+index.js
+Routes
+Tous les *.js dans routes/
+Middleware
+authenticateToken.js
+Validation Joi
+coursValidator.js, eleveValidator.js, profValidator.js, etc.
+Supabase clients
+supabaseClient.js, supabaseAdminClient.js
+Utilitaires
+email.js, et potentiellement d’autres à ajouter dans utils/
+Paiement
+abonnementsRoutes.js, stripeWebhook.js
+Données sensibles
+.env (clé Supabase, Stripe secret, etc.)
+
+
+
+
+
+====== backend/index.js ======
+
+// backend/index.js
+
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
+const rateLimit = require("express-rate-limit");
+const authenticateToken = require('./middleware/authenticateToken');
+
+const app = express();
+const PORT = 3001;
+
+// Middleware globaux
+app.use(cors());
+app.use(express.json());
+
+// Supabase public client (lecture publique non protégée)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false
+  }
+});
+
+// 🔍 Logger global
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
+// ========== ROUTES ==========
+
+app.use('/eleves', require('./routes/elevesRoutes'));
+app.use('/profs', require('./routes/profRoutes'));
+app.use('/cours', require('./routes/coursRoutes'));  // ✅ Route des cours bien positionnée
+app.use('/disponibilites', require('./routes/disponibilitesRoutes'));
+app.use('/reservations', require('./routes/reservationsRoutes'));
+app.use('/notifications', require('./routes/notificationsRoutes'));
+app.use('/abonnements', require('./routes/abonnementRoutes'));
+app.use('/planning', require('./routes/planningRoutes'));
+app.use('/creneaux', require('./routes/planningRoutes')); // ⚠️ attention doublon possible
+app.use('/check-email', require('./routes/checkEmailRoutes'));
+app.use('/stripe', require('./routes/stripeRoutes'));
+// app.use('/auth', require('./routes/authRoutes')); // si activée plus tard
+
+// ✅ Route de test
+app.get('/', (req, res) => {
+  res.json({ status: "🚀 API FirstArabic opérationnelle !" });
+});
+
+// Lancement serveur
+app.listen(PORT, () => {
+  console.log(`✅ API en écoute sur http://localhost:${PORT}`);
+});
+
+
+====== backend/supabaseClient.js ======
+
+
+// backend/supabaseClient.js
+require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+module.exports = supabase;
+
+
+
+====== backend/supabaseAdminClient.js ======
+
+// backend/supabaseAdminClient.js
+const { createClient } = require("@supabase/supabase-js");
+
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+module.exports = supabaseAdmin;
+
+
+====== backend/middleware/authenticateToken.js ======
+
+// backend/middleware/authenticateToken.js
+
+const { createClient } = require("@supabase/supabase-js");
+require("dotenv").config();
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+
+const authenticateToken = async (req, res, next) => {
+  console.log("🔐 [Middleware] authenticateToken appelé");
+
+  const rawAuthHeader = req.headers.authorization;
+  console.log("📥 Header Authorization brut :", rawAuthHeader);
+
+  const token = rawAuthHeader?.split(" ")[1];
+
+  if (!token) {
+    console.warn("🚫 Token manquant dans l'en-tête Authorization");
+    return res.status(401).json({ error: "Token manquant" });
+  }
+
+  console.log("🔑 Token extrait :", token);
+
+  try {
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false }
+    });
+
+    console.log("🔄 Appel à supabase.auth.getUser()...");
+    const { data, error } = await supabase.auth.getUser();
+    const user = data?.user;
+
+    if (error || !user) {
+      console.warn("🚫 Token invalide ou utilisateur introuvable", error?.message || "");
+      return res.status(401).json({ error: "Token invalide ou utilisateur non trouvé" });
+    }
+
+    console.log(`✅ Utilisateur authentifié : ${user.email} (ID: ${user.id})`);
+    req.user = user;
+    req.supabase = supabase;
+
+    console.log("➡️ Passage au middleware suivant");
+    next();
+  } catch (err) {
+    console.error("❌ Erreur dans authenticateToken :", err.message);
+    res.status(500).json({ error: "Erreur d'authentification", details: err.message });
+  }
+};
+
+module.exports = authenticateToken;
+
+
+====== backend/validators/coursValidator.js ======
+
+// backend/validators/coursValidator.js
+const Joi = require('joi');
+
+const coursSchema = Joi.object({
+  date: Joi.date().iso().required(),
+  prof_id: Joi.string().uuid().required(),
+  eleve_id: Joi.string().uuid().required(),
+  jitsi_url: Joi.string().uri().optional(),
+  statut: Joi.string().valid('prévu', 'annulé', 'terminé').optional(),
+  created_by: Joi.string().uuid().optional(),
+  created_at: Joi.date().optional()
+});
+
+module.exports = { coursSchema };
+
+
+====== backend/validators/eleveValidator.js ======
+
+const Joi = require('joi');
+
+const eleveInputSchema = Joi.object({
+  nom: Joi.string().min(2).max(100).required(),
+  email: Joi.string().email().optional()
+});
+
+const eleveSchema = Joi.object({
+  nom: Joi.string().required(),
+  email: Joi.string().email().optional(),
+  created_by: Joi.string().uuid().required()
+});
+
+module.exports = { eleveSchema, eleveInputSchema };
+
+
+====== backend/validators/profValidator.js ======
+
+const Joi = require('joi');
+
+const profSchema = Joi.object({
+  nom: Joi.string().required(),
+  specialite: Joi.string().allow('').optional(),
+  bio: Joi.string().allow('').optional()
+});
+
+module.exports = { profSchema };
+
+
+====== backend/routes/abonnementsRoutes.js (NOT FOUND) ======
+
+
+
+====== backend/routes/coursRoutes.js ======
+
+// backend/routes/coursRoutes.js
+const express = require("express");
+const router = express.Router();
+const { coursSchema } = require("../validators/coursValidator");
+const { createClient } = require("@supabase/supabase-js");
+const supabaseAdmin = require("../supabaseAdminClient");
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+
+const initSupabase = (req) =>
+  createClient(supabaseUrl, supabaseKey, {
+    global: { headers: { Authorization: req.headers.authorization } },
+  });
+
+// 📥 Créer un cours
+router.post("/", async (req, res) => {
+  console.log("\n🟢 [API] POST /cours appelée");
+  console.log("📥 Données reçues dans le body:", JSON.stringify(req.body, null, 2));
+
+  const { error: validationError } = coursSchema.validate(req.body);
+  if (validationError) {
+    console.log("🚫 [Validation] Erreur Joi:", validationError.details[0].message);
+    return res.status(400).json({
+      error: "Données invalides",
+      details: validationError.details[0].message,
+    });
+  }
+
+  const supabase = initSupabase(req);
+  const { date, prof_id, eleve_id } = req.body;
+
+  try {
+    console.log("🔐 Tentative récupération utilisateur courant...");
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      console.log("🚫 [Auth] Erreur récupération utilisateur:", userError?.message);
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    const user_id = userData.user.id;
+    console.log("✅ [Auth] Utilisateur authentifié ID:", user_id);
+
+    console.log(`🔎 Vérification de l'élève ${eleve_id} appartenant à l'utilisateur...`);
+    const { data: eleve, error: eleveError } = await supabase
+      .from("eleves")
+      .select("*")
+      .eq("id", eleve_id)
+      .eq("created_by", user_id)
+      .single();
+
+    if (eleveError || !eleve) {
+      console.log("🚫 [Sécurité] Élève introuvable ou non autorisé:", eleveError?.message || "Aucun élève retourné");
+      return res.status(403).json({ message: "Élève non autorisé ou inexistant" });
+    }
+
+    // 🔗 Génération du lien Jitsi
+    const jitsiRoom = `firstarabic-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    const lien_jitsi = `https://meet.jit.si/${jitsiRoom}`;
+    console.log("🔗 Lien Jitsi généré :", lien_jitsi);
+
+    console.log("✅ [Sécurité] Élève autorisé. Passage à l'insertion du cours...");
+    console.log("📤 Données insérées:", { date, prof_id, eleve_id, lien_jitsi });
+
+    const { error: insertError } = await supabase
+      .from("cours")
+      .insert([{ date, prof_id, eleve_id, jitsi_url: lien_jitsi }]);
+
+    if (insertError) {
+      console.log("❌ [DB] Erreur insertion cours:", insertError.message);
+      return res.status(500).json({ message: "Erreur création cours" });
+    }
+
+    console.log("✅ [Succès] Cours inséré avec succès ✅");
+    return res.status(200).json({ message: "Cours réservé avec succès", lien_jitsi });
+  } catch (err) {
+    console.error("❌ [Exception] Erreur inattendue dans POST /cours:", err);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+module.exports = router;
+
+
+====== backend/routes/elevesRoutes.js ======
+
+// routes/elevesRoutes.js
+const express = require('express');
+const router = express.Router();
+
+const { eleveInputSchema } = require('../validators/eleveValidator');
+const authenticateToken = require('../middleware/authenticateToken');
+const supabaseAdmin = require('../supabaseAdminClient');
+const { sendEmail } = require("../utils/email");
+
+
+// 🆕 Créer un élève
+router.post("/", authenticateToken, async (req, res) => {
+  console.log("🎯 [POST /eleves] Requête reçue");
+  console.log("📦 Corps de la requête:", req.body);
+
+  const { error: validationError } = eleveInputSchema.validate({
+    nom: req.body.nom,
+    email: req.body.email,
+  });
+
+  if (validationError) {
+    console.warn("❌ Données invalides:", validationError.details[0].message);
+    return res.status(400).json({ error: "Données invalides", details: validationError.details[0].message });
+  }
+
+  const { nom, email } = req.body;
+  const userId = req.user?.id;
+  console.log(`🔐 Utilisateur ID: ${userId} - Création d'élève avec nom: ${nom}, email: ${email}`);
+
+  try {
+    console.log("📥 Insertion dans la table 'eleves'...");
+    const { data, error } = await supabaseAdmin
+      .from("eleves")
+      .insert([{ nom, email, created_by: userId }])
+      .select();
+
+    if (error) throw error;
+    console.log("✅ Élève créé dans la BDD:", data[0]);
+
+    console.log("✉️ Envoi de l'email de bienvenue...");
+    await sendEmail(
+      email,
+      "Bienvenue sur FirstArabic ! 🌟",
+      `
+        <h2>Bienvenue ${nom} !</h2>
+        <p>Votre compte a été créé avec succès. Vous pouvez maintenant réserver des cours sur notre plateforme.</p>
+        <p><a href="https://firstarabic.com">Accéder à la plateforme</a></p>
+      `
+    );
+    console.log("📨 Email envoyé à:", email);
+
+    res.json({ success: true, eleve: data[0] });
+  } catch (e) {
+    console.error("💥 Erreur création élève:", e.message);
+    res.status(500).json({ error: "Erreur creation eleve", details: e.message });
+  }
+});
+
+
+// 🔎 Liste des élèves du user connecté
+router.get('/', authenticateToken, async (req, res) => {
+  const userId = req.user?.id;
+  console.log(`🔎 [GET /eleves] Récupération des élèves pour user ID: ${userId}`);
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('eleves')
+      .select('*')
+      .eq('created_by', userId);
+
+    if (error) throw error;
+    console.log("📋 Élèves récupérés:", data);
+    res.json({ success: true, eleves: data });
+  } catch (e) {
+    console.error("💥 Erreur récupération élèves:", e.message);
+    res.status(500).json({ error: "Erreur recuperation eleves", details: e.message });
+  }
+});
+
+
+// 🔎 Détail d’un élève
+router.get('/:id', authenticateToken, async (req, res) => {
+  const userId = req.user?.id;
+  const eleveId = req.params.id;
+  console.log(`🔍 [GET /eleves/${eleveId}] Récupération élève pour user ID: ${userId}`);
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('eleves')
+      .select('*')
+      .eq('id', eleveId)
+      .eq('created_by', userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    console.log("📄 Élève trouvé:", data);
+    res.json({ success: true, eleve: data });
+  } catch (e) {
+    console.error("💥 Erreur récupération élève:", e.message);
+    res.status(404).json({ error: "eleve non trouve", details: e.message });
+  }
+});
+
+
+// ✏️ Modifier un élève
+router.put('/:id', authenticateToken, async (req, res) => {
+  const userId = req.user?.id;
+  const eleveId = req.params.id;
+  const { nom } = req.body;
+
+  console.log(`✏️ [PUT /eleves/${eleveId}] Modification de l'élève pour user ID: ${userId}`);
+  console.log("📝 Nouveau nom:", nom);
+
+  if (!nom) {
+    console.warn("⚠️ Nom manquant");
+    return res.status(400).json({ error: "Nom requis" });
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('eleves')
+      .update({ nom })
+      .eq('id', eleveId)
+      .eq('created_by', userId)
+      .select();
+
+    if (error) throw error;
+    console.log("✅ Élève mis à jour:", data[0]);
+    res.json({ success: true, eleve: data[0] });
+  } catch (e) {
+    console.error("💥 Erreur mise à jour élève:", e.message);
+    res.status(500).json({ error: "Erreur mise a jour eleve", details: e.message });
+  }
+});
+
+
+// 🗑️ Supprimer un élève
+router.delete('/:id', authenticateToken, async (req, res) => {
+  const userId = req.user?.id;
+  const eleveId = req.params.id;
+  console.log(`🗑️ [DELETE /eleves/${eleveId}] Suppression de l'élève pour user ID: ${userId}`);
+
+  try {
+    const { error } = await supabaseAdmin
+      .from('eleves')
+      .delete()
+      .eq('id', eleveId)
+      .eq('created_by', userId);
+
+    if (error) throw error;
+    console.log("🧹 Élève supprimé avec succès");
+    res.json({ success: true, message: "eleve supprime" });
+  } catch (e) {
+    console.error("💥 Erreur suppression élève:", e.message);
+    res.status(500).json({ error: "Erreur suppression eleve", details: e.message });
+  }
+});
+
+module.exports = router;
+
+
+====== backend/routes/profsRoutes.js (NOT FOUND) ======
+
+
+
+====== backend/routes/disponibilitesRoutes.js ======
+
+// backend/routes/disponibilitesRoutes.js
+const express = require("express");
+const router = express.Router();
+const { disponibiliteSchema, updateDisponibiliteSchema } = require("../validators/disponibiliteValidator");
+const authenticateToken = require("../middleware/authenticateToken");
+const supabaseAdmin = require("../supabaseAdminClient");
+
+// 🔒 Middleware
+router.use(authenticateToken);
+
+// ✅ Créer une disponibilité
+router.post("/", async (req, res) => {
+  console.log("🆕 [POST] /disponibilites - Données reçues:", req.body);
+
+  const { error } = disponibiliteSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  const { jour, heure_debut, heure_fin, prof_id } = req.body;
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("disponibilites")
+      .insert([{ jour, heure_debut, heure_fin, prof_id }])
+      .select();
+
+    if (error) throw error;
+
+    res.json({ success: true, disponibilite: data[0] });
+  } catch (err) {
+    console.error("❌ Erreur création disponibilité:", err);
+    res.status(500).json({ error: "Erreur création disponibilité", details: err.message });
+  }
+});
+
+// ✅ Récupérer toutes les disponibilités
+router.get("/", async (req, res) => {
+  try {
+    const { data, error } = await req.supabase.from("disponibilites").select("*");
+    if (error) throw error;
+    res.json({ success: true, disponibilites: data });
+  } catch (err) {
+    console.error("❌ Erreur récupération disponibilités:", err);
+    res.status(500).json({ error: "Erreur récupération disponibilités", details: err.message });
+  }
+});
+
+// ✅ Récupérer une disponibilité par ID
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await req.supabase
+      .from("disponibilites")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw error;
+    res.json({ success: true, disponibilite: data });
+  } catch (err) {
+    console.error("❌ Erreur récupération disponibilité par ID:", err);
+    res.status(500).json({ error: "Erreur récupération disponibilité", details: err.message });
+  }
+});
+
+// ✅ Mettre à jour une disponibilité (PUT)
+router.put("/:id", async (req, res) => {
+  console.log("✏️ [PUT] /disponibilites/:id - Données reçues:", req.body);
+
+  const { error } = disponibiliteSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  try {
+    const { id } = req.params;
+    const { jour, heure_debut, heure_fin, prof_id } = req.body;
+
+    const { data, error } = await req.supabase
+      .from("disponibilites")
+      .update({ jour, heure_debut, heure_fin, prof_id })
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    res.json({ success: true, disponibilite: data[0] });
+  } catch (err) {
+    console.error("❌ Erreur mise à jour disponibilité:", err);
+    res.status(500).json({ error: "Erreur mise à jour disponibilité", details: err.message });
+  }
+});
+
+// ✅ Mettre à jour partiellement une disponibilité (PATCH)
+router.patch("/:id", async (req, res) => {
+  console.log("✏️ [PATCH] /disponibilites/:id - Données reçues:", req.body);
+
+  const { error } = updateDisponibiliteSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  try {
+    const { id } = req.params;
+    const updateFields = req.body;
+
+    const { data, error } = await req.supabase
+      .from("disponibilites")
+      .update(updateFields)
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    res.json({ success: true, disponibilite: data[0] });
+  } catch (err) {
+    console.error("❌ Erreur patch disponibilité:", err);
+    res.status(500).json({ error: "Erreur mise à jour disponibilité", details: err.message });
+  }
+});
+
+// ✅ Supprimer une disponibilité
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await req.supabase
+      .from("disponibilites")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+    res.json({ success: true, message: "Disponibilité supprimée" });
+  } catch (err) {
+    console.error("❌ Erreur suppression disponibilité:", err);
+    res.status(500).json({ error: "Erreur suppression disponibilité", details: err.message });
+  }
+});
+
+module.exports = router;
+
+
+====== backend/routes/planningRoutes.js ======
+
+// backend/routes/planningRoutes.js
+const express = require("express");
+const authenticateToken = require("../middleware/authenticateToken");
+
+const router = express.Router();
+
+// 📅 Récupérer tous les cours de l'utilisateur connecté
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const statut = req.query.statut || null;
+
+    const { data, error } = await req.supabase
+      .from("cours")
+      .select(`
+        id, date, statut, jitsi_url,
+        profs (nom),
+        eleves (nom)
+      `)
+      .eq("created_by", req.user.id);
+
+    if (error) throw error;
+
+    const planning = data
+      .filter(c => !statut || c.statut === statut)
+      .map(c => ({
+        id: c.id,
+        date: c.date,
+        statut: c.statut,
+        lien: c.jitsi_url,
+        prof: c.profs?.nom || null,
+        eleve: c.eleves?.nom || null
+      }));
+
+    res.json({ success: true, planning });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur récupération planning", details: e.message });
+  }
+});
+
+// 📅 Récupérer les créneaux réservés (cours confirmés)
+router.get("/reserves", authenticateToken, async (req, res) => {
+  try {
+    const { prof_id } = req.query;
+    if (!prof_id) return res.status(400).json({ error: "prof_id requis" });
+
+    const { data, error } = await req.supabase
+      .from("cours")
+      .select("date")
+      .eq("prof_id", prof_id)
+      .eq("statut", "confirme");
+
+    if (error) throw error;
+
+    const dureeCoursMin = 30;
+    const reserves = data.map(c => {
+      const start = new Date(c.date);
+      const end = new Date(start.getTime() + dureeCoursMin * 60000);
+      return { start: start.toISOString(), end: end.toISOString() };
+    });
+
+    res.json({ success: true, reserves });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur récupération créneaux réservés", details: e.message });
+  }
+});
+
+// 📆 Récupérer les créneaux disponibles pour un prof
+router.get("/disponibles", authenticateToken, async (req, res) => {
+  try {
+    const { prof_id } = req.query;
+    if (!prof_id) return res.status(400).json({ error: "prof_id requis" });
+
+    const { data: disponibilites, error: dispoError } = await req.supabase
+      .from("disponibilites")
+      .select("jour, heure_debut, heure_fin")
+      .eq("prof_id", prof_id);
+    if (dispoError) throw dispoError;
+
+    const joursMap = {
+      lundi: 1, mardi: 2, mercredi: 3, jeudi: 4, vendredi: 5, samedi: 6, dimanche: 0
+    };
+
+    const dureeCoursMin = 30;
+    const now = new Date();
+    const prochainsCreneaux = [];
+
+    for (const dispo of disponibilites) {
+      const dayOffset = (7 + joursMap[dispo.jour.toLowerCase()] - now.getDay()) % 7;
+      const dateCreneau = new Date(now);
+      dateCreneau.setDate(now.getDate() + dayOffset);
+      dateCreneau.setHours(0, 0, 0, 0);
+
+      const [hStart, mStart] = dispo.heure_debut.split(":").map(Number);
+      const [hEnd, mEnd] = dispo.heure_fin.split(":").map(Number);
+
+      const start = new Date(dateCreneau);
+      start.setHours(hStart, mStart, 0);
+
+      const end = new Date(dateCreneau);
+      end.setHours(hEnd, mEnd, 0);
+
+      for (let t = new Date(start); t < end; t.setMinutes(t.getMinutes() + dureeCoursMin)) {
+        const creneauStart = new Date(t);
+        const creneauEnd = new Date(t.getTime() + dureeCoursMin * 60000);
+        prochainsCreneaux.push({ start: creneauStart.toISOString(), end: creneauEnd.toISOString() });
+      }
+    }
+
+    const { data: reserves, error: reserveError } = await req.supabase
+      .from("cours")
+      .select("date")
+      .eq("prof_id", prof_id)
+      .eq("statut", "confirme");
+    if (reserveError) throw reserveError;
+
+    const reservesSet = new Set(reserves.map(r => new Date(r.date).toISOString()));
+    const disponibles = prochainsCreneaux.filter(c => !reservesSet.has(c.start));
+
+    res.json({ success: true, disponibles });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur récupération disponibilités filtrées", details: e.message });
+  }
+});
+
+module.exports = router;
+
+
+====== backend/routes/reservationsRoutes.js ======
+
+// backend/routes/reservationsRoutes.js
+const express = require("express");
+const router = express.Router();
+const { createReservationSchema, updateReservationSchema } = require("../validators/reservationValidator");
+const authenticateToken = require("../middleware/authenticateToken");
+const supabaseAdmin = require("../supabaseAdminClient");
+
+// 🔒 Middleware
+router.use(authenticateToken);
+
+// ✅ Créer une réservation
+router.post("/", async (req, res) => {
+  console.log("🆕 [POST] /reservations - Données reçues:", req.body);
+
+  const { error } = createReservationSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  try {
+    const { prof_id, date, heure_debut, heure_fin, statut } = req.body;
+
+    const { data, error } = await supabaseAdmin
+      .from("reservations")
+      .insert([{ prof_id, date, heure_debut, heure_fin, statut }])
+      .select();
+
+    if (error) throw error;
+
+    res.json({ success: true, reservation: data[0] });
+  } catch (err) {
+    console.error("❌ Erreur création réservation:", err);
+    res.status(500).json({ error: "Erreur création réservation", details: err.message });
+  }
+});
+
+// ✅ Lire toutes les réservations
+router.get("/", async (req, res) => {
+  try {
+    const { data, error } = await req.supabase.from("reservations").select("*");
+    if (error) throw error;
+    res.json({ success: true, reservations: data });
+  } catch (err) {
+    console.error("❌ Erreur récupération réservations:", err);
+    res.status(500).json({ error: "Erreur récupération réservations", details: err.message });
+  }
+});
+
+// ✅ Lire une réservation par ID
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await req.supabase
+      .from("reservations")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw error;
+    res.json({ success: true, reservation: data });
+  } catch (err) {
+    console.error("❌ Erreur récupération réservation:", err);
+    res.status(500).json({ error: "Erreur récupération réservation", details: err.message });
+  }
+});
+
+// ✅ Modifier une réservation
+router.put("/:id", async (req, res) => {
+  console.log("✏️ [PUT] /reservations/:id - Données reçues:", req.body);
+
+  const { error } = updateReservationSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  try {
+    const { id } = req.params;
+    const { data, error } = await req.supabase
+      .from("reservations")
+      .update(req.body)
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    res.json({ success: true, reservation: data[0] });
+  } catch (err) {
+    console.error("❌ Erreur mise à jour réservation:", err);
+    res.status(500).json({ error: "Erreur mise à jour réservation", details: err.message });
+  }
+});
+
+// ✅ Supprimer une réservation
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await req.supabase.from("reservations").delete().eq("id", id);
+    if (error) throw error;
+    res.json({ success: true, message: "Réservation supprimée" });
+	  } catch (err) {
+    console.error("❌ Erreur suppression réservation:", err);
+    res.status(500).json({ error: "Erreur suppression réservation", details: err.message });
+  }
+});
+
+module.exports = router;
+
+
+
+====== backend/routes/notificationsRoutes.js ======
+
+// backend/routes/notificationsRoutes.js
+const express = require('express');
+const router = express.Router();
+const { notificationSchema, updateNotificationSchema } = require('../validators/notificationValidator');
+const authenticateToken = require('../middleware/authenticateToken');
+const supabase = require('../supabaseClient');
+
+// 📥 Créer une notification
+router.post('/', authenticateToken, async (req, res) => {
+  const { error: validationError } = notificationSchema.validate(req.body);
+  if (validationError) {
+    return res.status(400).json({ error: "Données invalides", details: validationError.details[0].message });
+  }
+
+  const { message, lue, type } = req.body;
+  const created_by = req.user.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert([{ message, lue: lue || false, type: type || 'info', created_by }])
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    console.log("✅ Notification créée:", data);
+    res.json({ success: true, notification: data });
+  } catch (e) {
+    console.error("❌ Erreur création notif:", e.message);
+    res.status(500).json({ error: "Erreur création notification", details: e.message });
+  }
+});
+
+// 📋 Récupérer ses notifications
+router.get('/', authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('created_by', req.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json({ success: true, notifications: data });
+  } catch (e) {
+    console.error("❌ Erreur lecture notifs:", e.message);
+    res.status(500).json({ error: "Erreur lecture notifications", details: e.message });
+  }
+});
+
+// ✅ Marquer une notification comme lue
+router.patch('/:id/lue', authenticateToken, async (req, res) => {
+  const notifId = req.params.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .update({ lue: true })
+      .eq('id', notifId)
+      .eq('created_by', req.user.id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    res.json({ success: true, notification: data });
+  } catch (e) {
+    console.error("❌ Erreur maj lue:", e.message);
+    res.status(500).json({ error: "Erreur maj notification", details: e.message });
+  }
+});
+
+// 🗑️ Supprimer une notification
+router.delete('/:id', authenticateToken, async (req, res) => {
+  const notifId = req.params.id;
+
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notifId)
+      .eq('created_by', req.user.id);
+
+    if (error) throw error;
+    res.json({ success: true, message: "Notification supprimée" });
+  } catch (e) {
+    console.error("❌ Erreur suppression notif:", e.message);
+    res.status(500).json({ error: "Erreur suppression notification", details: e.message });
+  }
+});
+
+module.exports = router;
+
+
+====== backend/routes/stripeWebhook.js (NOT FOUND) ======
+
+
+
+====== backend/utils/email.js ======
+
+// utils/email.js
+const nodemailer = require('nodemailer');
+
+// Configuration du transporteur Gmail
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Fonction pour envoyer un email HTML
+async function sendEmail(to, subject, html) {
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER, // ✅ corrigé ici
+      to,
+      subject,
+      html
+    });
+    console.log(`📧 Email envoyé à ${to}`);
+  } catch (error) {
+    console.error(`❌ Erreur envoi email à ${to} :`, error.message);
+  }
+}
+
+module.exports = { sendEmail };

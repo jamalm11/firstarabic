@@ -1,0 +1,1012 @@
+Voici la liste exhaustive de tous les fichiers utilisés dans la partie Frontend de ton projet, selon la structure actuelle détectée (React avec BrowserRouter, Supabase, Stripe, Jitsi, etc.) :
+📁 frontend/ — structure complète actuelle
+
+Fichiers racines
+	•	frontend/package.json
+	•	frontend/.env
+	•	frontend/.gitignore
+	•	frontend/tailwind.config.js
+	•	frontend/postcss.config.js
+	•	frontend/vite.config.js
+	•	frontend/index.html
+
+📁 frontend/src/
+	•	frontend/src/main.jsx
+	•	frontend/src/App.js
+	•	frontend/src/supabaseClient.js ✅
+
+📁 frontend/src/components/
+	•	frontend/src/components/Header.js
+	•	frontend/src/components/Footer.js
+	•	frontend/src/components/PrivateRoute.js
+
+📁 frontend/src/pages/ (toutes les pages principales accessibles via route)
+	•	frontend/src/pages/Login.js
+	•	frontend/src/pages/Register.js
+	•	frontend/src/pages/ForgotPassword.js
+	•	frontend/src/pages/Dashboard.js ✅
+	•	frontend/src/pages/ProfDashboard.js ✅
+	•	frontend/src/pages/Planning.js
+	•	frontend/src/pages/Reservation.js
+	•	frontend/src/pages/Professeurs.js
+	•	frontend/src/pages/Cours.js
+	•	frontend/src/pages/Abonnement.js
+	•	frontend/src/pages/Success.js
+	•	frontend/src/pages/Cancel.js
+
+📁 frontend/src/utils/
+	•	frontend/src/utils/api.js (ou similaire : pour les appels fetch/axios)
+	•	frontend/src/utils/helpers.js (ex : formatDate, getToken)
+
+(optionnel) 📁 frontend/src/hooks/
+	•	frontend/src/hooks/useAuth.js (si contexte d’auth utilisé)
+
+(optionnel) 📁 frontend/src/context/
+	•	frontend/src/context/AuthContext.js (si gestion par context)
+
+⸻
+
+
+
+
+
+
+======================
+# frontend-firstarabic/package.json
+======================
+
+{
+  "name": "frontend-firstarabic",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.10.0",
+    "date-fns": "^4.1.0",
+    "react": "^19.1.0",
+    "react-big-calendar": "^1.19.4",
+    "react-calendar": "^6.0.0",
+    "react-datepicker": "^8.4.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+
+
+======================
+# frontend-firstarabic/.env
+======================
+
+REACT_APP_SUPABASE_URL=https://aerhvxfzzpveykkedmej.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlcmh2eGZ6enB2ZXlra2VkbWVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwMjgzOTcsImV4cCI6MjA2NDYwNDM5N30.kraJGVn-0O-D7DXTfwVpqP9dbHpJOmALqOrzVMhlONM
+
+
+======================
+# frontend-firstarabic/.gitignore
+======================
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/tailwind.config.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/postcss.config.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/vite.config.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/index.html
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/main.jsx
+
+
+======================
+# frontend-firstarabic/src/App.js
+======================
+
+// src/App.js
+import Professeurs from "./pages/Professeurs";
+import Reservation from "./pages/Reservation";
+import Planning from "./pages/Planning";
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from './pages/ForgotPassword';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./components/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import ProfDashboard from "./pages/ProfDashboard";
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/prof-dashboard" element={<ProfDashboard />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/planning" element={<Planning />} />
+        <Route path="/reservation" element={<Reservation />} />
+        <Route path="/professeurs" element={<Professeurs />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* ✅ Pas besoin de /login, la page de connexion est déjà sur / */}
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+
+======================
+# frontend-firstarabic/src/supabaseClient.js
+======================
+
+// src/supabaseClient.js
+import { createClient } from "@supabase/supabase-js";
+
+//const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+//const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+
+
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    flowType: 'pkce',
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: localStorage,
+    redirectTo: `${window.location.origin}/reset-password`, // ✅ Redirection explicite
+  },
+});
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/components/Header.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/components/Footer.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/components/PrivateRoute.js
+
+
+======================
+# frontend-firstarabic/src/pages/Login.js
+======================
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
+import { Link } from 'react-router-dom';
+
+function Login() {
+  const [email, setEmail] = useState('');
+  const [motDePasse, setMotDePasse] = useState('');
+  const [erreur, setErreur] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErreur('');
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: motDePasse,
+    });
+
+    if (error) {
+      setErreur("❌ Email ou mot de passe incorrect");
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
+  return (
+    <div>
+      <h2>Connexion</h2>
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Mot de passe"
+          value={motDePasse}
+          onChange={(e) => setMotDePasse(e.target.value)}
+          required
+        />
+        <button type="submit">Se connecter</button>
+      </form>
+      
+      {erreur && <p style={{ color: 'red' }}>{erreur}</p>}
+
+      <p style={{ marginTop: "10px" }}>
+        <Link to="/forgot-password">Mot de passe oublié ?</Link>
+      </p>
+    </div>
+  );
+}
+
+export default Login;
+
+
+======================
+# frontend-firstarabic/src/pages/Register.js
+======================
+
+// src/pages/Register.js
+import React, { useState } from "react";
+import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
+
+function Register() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [nom, setNom] = useState("");
+  const [role, setRole] = useState("eleve");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      console.log("📧 Vérification de l’email :", email);
+
+      const check = await fetch("http://localhost:3001/check-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const result = await check.json();
+      console.log("🧪 Résultat check-email:", result);
+
+      if (result.exists) {
+        alert("❌ Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.");
+        return;
+      }
+
+      console.log("🔐 Tentative d'inscription via Supabase...");
+
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: nom,
+            role: role,
+          },
+        },
+      });
+
+      if (signUpError) throw signUpError;
+
+      const user = data?.user;
+      const userId = user?.id;
+      console.log("✅ Utilisateur Supabase créé :", user);
+
+      const session = await supabase.auth.getSession();
+      const accessToken = session?.data?.session?.access_token;
+
+      if (userId && accessToken) {
+        const insertUrl = role === "eleve" ? "http://localhost:3001/eleves" : "http://localhost:3001/profs";
+        console.log(`📥 Insertion dans ${role === "eleve" ? "eleves" : "profs"} à ${insertUrl}`);
+
+        const insertResponse = await fetch(insertUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            nom,
+            email,
+            created_by: userId
+          }),
+        });
+
+        const insertResult = await insertResponse.json();
+        console.log("✅ Résultat insertion :", insertResult);
+      }
+
+      alert("📧 Un lien de confirmation a été envoyé à votre email. Veuillez l’activer avant de vous connecter.");
+      navigate("/");
+    } catch (err) {
+      console.error("❌ Erreur d'inscription :", err);
+      setError(err.message || "Erreur lors de l'inscription");
+    }
+  };
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h2>Créer un compte</h2>
+      <form onSubmit={handleRegister}>
+        <div>
+          <label>Nom complet :</label>
+          <input value={nom} onChange={(e) => setNom(e.target.value)} required />
+        </div>
+
+        <div>
+          <label>Email :</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </div>
+
+        <div>
+          <label>Mot de passe :</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+
+        <div>
+          <label>Je suis : </label>
+          <select value={role} onChange={(e) => setRole(e.target.value)}>
+            <option value="eleve">Élève</option>
+            <option value="prof">Professeur</option>
+          </select>
+        </div>
+
+        <button type="submit" style={{ marginTop: "1rem" }}>
+          S'inscrire
+        </button>
+      </form>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <p style={{ marginTop: "20px" }}>
+        Vous avez déjà un compte ? <a href="/">Se connecter</a>
+      </p>
+    </div>
+  );
+}
+
+export default Register;
+
+
+======================
+# frontend-firstarabic/src/pages/ForgotPassword.js
+======================
+
+// src/pages/ForgotPassword.js
+import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
+
+function ForgotPassword() {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState(null);
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    setMessage(null);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:3000/reset-password",
+    });
+
+    if (error) {
+      setMessage({ type: 'error', text: error.message });
+    } else {
+      setMessage({ type: 'success', text: "📧 Un lien de réinitialisation a été envoyé." });
+    }
+  };
+
+  return (
+    <div>
+      <h2>Mot de passe oublié</h2>
+      <form onSubmit={handleReset}>
+        <input
+          type="email"
+          placeholder="Votre email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <button type="submit">Réinitialiser le mot de passe</button>
+      </form>
+      {message && <p style={{ color: message.type === 'error' ? 'red' : 'green' }}>{message.text}</p>}
+    </div>
+  );
+}
+
+export default ForgotPassword;
+
+
+======================
+# frontend-firstarabic/src/pages/Dashboard.js
+======================
+
+// src/pages/Dashboard.js
+import React, { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+
+function Dashboard() {
+  const [session, setSession] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const role = session?.user?.user_metadata?.role;
+
+      if (role === "prof") {
+        navigate("/prof-dashboard");
+        return;
+      }
+
+      setSession(session);
+    };
+
+    fetchSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const role = session?.user?.user_metadata?.role;
+
+      if (role === "prof") {
+        navigate("/prof-dashboard");
+        return;
+      }
+
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  // 🧠 Vérifie si l’élève existe — sinon, le créer et notifier
+  useEffect(() => {
+    if (!session) return;
+
+    const checkOrCreateEleve = async () => {
+      const token = session.access_token;
+      const email = session.user.email;
+
+      try {
+        const res = await axios.get("http://localhost:3001/eleves", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const alreadyExists = res.data?.eleves?.length > 0;
+
+        if (!alreadyExists) {
+          console.log("🚨 Élève introuvable côté BDD — création en cours...");
+
+          const payload = { nom: email, email };
+          await axios.post("http://localhost:3001/eleves", payload, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          console.log("✅ Élève inséré avec succès !");
+          alert("✅ Votre profil a été créé avec succès !");
+        } else {
+          console.log("✅ Élève déjà présent en BDD");
+        }
+      } catch (err) {
+        console.error("❌ Erreur vérification/insertion élève :", err?.response?.data || err.message);
+      }
+    };
+
+    checkOrCreateEleve();
+  }, [session]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
+
+  if (!session) return <p>🔒 Veuillez vous connecter</p>;
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>👋 Bienvenue dans l'espace élève</h1>
+      <p>Connecté : {session.user.email}</p>
+
+      <Link to="/professeurs">📌 Réserver un cours</Link>
+      <br />
+      <Link to="/planning">📅 Voir mon planning</Link>
+
+      <button onClick={handleLogout} style={{ marginTop: "2rem" }}>
+        Se déconnecter
+      </button>
+    </div>
+  );
+}
+
+export default Dashboard;
+
+
+======================
+# frontend-firstarabic/src/pages/ProfDashboard.js
+======================
+
+import React, { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+
+function ProfDashboard() {
+  const [session, setSession] = useState(null);
+  const [token, setToken] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const role = session?.user?.user_metadata?.role;
+      if (role === "eleve") {
+        navigate("/dashboard"); // redirige les élèves
+        return;
+      }
+      setSession(session);
+      setToken(session?.access_token || null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const role = session?.user?.user_metadata?.role;
+      if (role === "eleve") {
+        navigate("/dashboard");
+        return;
+      }
+      setSession(session);
+      setToken(session?.access_token || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  useEffect(() => {
+    const createProfIfNeeded = async () => {
+      if (!token || !session?.user?.email) return;
+
+      try {
+        const res = await axios.get("http://localhost:3001/profs", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const exists = res.data.profs?.some(p => p.nom === session.user.email);
+        if (!exists) {
+          await axios.post("http://localhost:3001/prof", {
+            nom: session.user.email,
+            specialite: "non spécifiée",
+          }, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          console.log("✅ Professeur créé automatiquement");
+        }
+      } catch (err) {
+        console.error("❌ Erreur création prof :", err);
+      }
+    };
+
+    createProfIfNeeded();
+  }, [token, session?.user?.email]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
+
+  if (!session) {
+    return <p>🔒 Veuillez vous connecter</p>;
+  }
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>🎓 Bienvenue dans l'espace professeur</h1>
+      <p>Connecté : {session.user.email}</p>
+      <p>Des fonctionnalités spécifiques aux profs seront ajoutées ici.</p>
+      <Link to="/planning">📅 Voir mon planning</Link>
+      <br />
+      <button onClick={handleLogout} style={{ marginTop: "2rem" }}>
+        Se déconnecter
+      </button>
+    </div>
+  );
+}
+
+export default ProfDashboard;
+
+
+======================
+# frontend-firstarabic/src/pages/Planning.js
+======================
+
+// src/pages/Planning.js
+import React, { useEffect, useState } from "react";
+import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import format from "date-fns/format";
+import parse from "date-fns/parse";
+import startOfWeek from "date-fns/startOfWeek";
+import getDay from "date-fns/getDay";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import fr from "date-fns/locale/fr";
+import { supabase } from "../supabaseClient";
+
+const locales = {
+  fr: fr,
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+
+function Planning() {
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchPlanning = async () => {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+
+      if (!token) return;
+
+      const response = await fetch("http://localhost:3001/planning", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.planning) {
+        const formatted = result.planning.map((cours) => ({
+          title: `${cours.eleve || "Élève"} / ${cours.prof || "Prof"}`,
+          start: new Date(cours.date),
+          end: new Date(new Date(cours.date).getTime() + 30 * 60000),
+          resource: { lien: cours.lien },
+        }));
+        setEvents(formatted);
+      }
+    };
+
+    fetchPlanning();
+  }, []);
+
+  const eventStyleGetter = () => ({
+    style: {
+      backgroundColor: "#0d9488",
+      color: "white",
+      borderRadius: "8px",
+      padding: "4px",
+      border: "none",
+    },
+  });
+
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">📅 Planning des cours</h2>
+      <Calendar
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ height: 500 }}
+        eventPropGetter={eventStyleGetter}
+        onSelectEvent={(event) => {
+          if (event.resource?.lien) {
+            window.open(event.resource.lien, "_blank");
+          }
+        }}
+      />
+    </div>
+  );
+}
+
+export default Planning;
+
+
+======================
+# frontend-firstarabic/src/pages/Reservation.js
+======================
+
+// src/pages/Reservation.js
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { supabase } from "../supabaseClient";
+import axios from "axios";
+
+function Reservation() {
+  const [session, setSession] = useState(null);
+  const [token, setToken] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState("09:00");
+  const [prof, setProf] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const profId = new URLSearchParams(location.search).get("prof_id");
+
+  // 1. Récupération session Supabase
+  useEffect(() => {
+    console.log("🔍 [Etape 1] Tentative de récupération session Supabase...");
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        console.warn("⛔ [Etape 1] Session introuvable, redirection.");
+        alert("⛔ Session expirée. Merci de vous reconnecter.");
+        navigate("/");
+        return;
+      }
+      setSession(session);
+      const access_token = session?.access_token || null;
+      setToken(access_token);
+      console.log("✅ [Etape 1] Session récupérée :", session);
+      console.log("🔑 [Etape 1] Access Token :", access_token);
+    });
+  }, [navigate]);
+
+  // 2. Récupération du professeur
+  useEffect(() => {
+    const fetchProf = async () => {
+      if (!token || !profId) {
+        console.warn("⏳ [Etape 2] Token ou profId manquant, attente...");
+        return;
+      }
+
+      console.log("🔍 [Etape 2] Récupération des professeurs...");
+      try {
+        const res = await axios.get("http://localhost:3001/profs", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("✅ [Etape 2] Liste profs reçue :", res.data);
+        const found = res.data?.profs?.find((p) => p.id === profId);
+        if (!found) {
+          console.warn("❌ [Etape 2] Professeur introuvable dans la liste !");
+          setError("Professeur introuvable");
+        } else {
+          setProf(found);
+          console.log("👨‍🏫 [Etape 2] Professeur trouvé :", found);
+        }
+      } catch (err) {
+        console.error("❌ [Etape 2] Erreur récupération prof :", err);
+        setError("Erreur lors du chargement du professeur");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProf();
+  }, [token, profId]);
+
+  // 3. Envoi de la réservation
+  const handleReservation = async () => {
+    console.log("🟡 [Etape 3] Début de la réservation...");
+    try {
+      if (!token) {
+        console.warn("⛔ [Etape 3] Token invalide");
+        alert("⛔ Session expirée. Veuillez vous reconnecter.");
+        navigate("/");
+        return;
+      }
+
+      const fullDate = new Date(selectedDate);
+      const [hours, minutes] = selectedTime.split(":").map(Number);
+      fullDate.setHours(hours, minutes, 0);
+
+      console.log("📆 [Etape 3] Créneau choisi :", fullDate.toISOString(), "à", selectedTime);
+
+      // Récupérer l'élève connecté
+      console.log("🔍 [Etape 3] Récupération des données élève...");
+      const { data: eleveData } = await axios.get("http://localhost:3001/eleves", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("✅ [Etape 3] Données élève reçues :", eleveData);
+
+      const eleve_id = eleveData.eleves?.[0]?.id;
+      if (!eleve_id) {
+        console.error("❌ [Etape 3] Élève introuvable !");
+        throw new Error("Élève non trouvé");
+      }
+
+      const payload = {
+        date: fullDate.toISOString(),
+        prof_id: profId,
+        eleve_id,
+      };
+
+      console.log("📨 [Etape 3] Payload envoyé au backend :", payload);
+
+      const res = await axios.post("http://localhost:3001/cours", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("✅ [Etape 3] Réservation réussie :", res.data);
+      alert("✅ Cours réservé avec succès !");
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("❌ [Etape 3] Erreur lors de la réservation :", err?.response?.data || err.message);
+      alert("Erreur lors de la réservation");
+    }
+  };
+
+  // 4. Affichage conditionnel
+  if (!profId) {
+    console.warn("⚠️ [Etape 4] Aucun prof_id trouvé dans l'URL");
+    return (
+      <div style={{ padding: "2rem" }}>
+        <p>⚠️ Aucun professeur sélectionné.</p>
+        <p>
+          Veuillez d’abord <Link to="/professeurs">choisir un professeur</Link>.
+        </p>
+      </div>
+    );
+  }
+
+  if (!session) return <p>🔐 Veuillez vous connecter</p>;
+  if (error) return <p>❌ {error}</p>;
+  if (loading) return <p>⏳ Chargement du professeur...</p>;
+  if (!prof) return <p>⚠️ Professeur non trouvé</p>;
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h2>📅 Réserver un cours avec {prof.nom}</h2>
+
+      <label>Date :</label>
+      <DatePicker selected={selectedDate} onChange={setSelectedDate} />
+
+      <br />
+      <label>Heure :</label>
+      <select value={selectedTime} onChange={(e) => setSelectedTime(e.target.value)}>
+        {["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"].map((h) => (
+          <option key={h} value={h}>{h}</option>
+        ))}
+      </select>
+
+      <br />
+      <button onClick={handleReservation} style={{ marginTop: "1rem" }}>
+        Réserver ce créneau
+      </button>
+    </div>
+  );
+}
+
+export default Reservation;
+
+
+======================
+# frontend-firstarabic/src/pages/Professeurs.js
+======================
+
+// ✅ Nouveau fichier : src/pages/Professeurs.js
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "../supabaseClient";
+import axios from "axios";
+
+function Professeurs() {
+  const [profs, setProfs] = useState([]);
+  const [token, setToken] = useState(null);
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setToken(session?.access_token || null);
+    });
+  }, []);
+
+  useEffect(() => {
+    const fetchProfs = async () => {
+      if (!token || !session) return;
+
+      try {
+        const res = await axios.get("http://localhost:3001/profs", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const emailEleve = session.user.email;
+        const validProfs = res.data.profs.filter(
+          (p) => p.is_validated !== false && p.email !== emailEleve
+        );
+
+        setProfs(validProfs);
+      } catch (err) {
+        console.error("Erreur récupération profs", err);
+      }
+    };
+
+    fetchProfs();
+  }, [token, session]);
+
+  if (!token) return <p>⏳ Chargement...</p>;
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h2>👨‍🏫 Sélectionnez un professeur</h2>
+      <ul>
+        {profs.map((prof) => (
+          <li key={prof.id} style={{ margin: "1rem 0" }}>
+            <Link to={`/reservation?prof_id=${prof.id}`}>
+              {prof.nom} — {prof.specialite || "non spécifiée"}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Professeurs;
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/pages/Cours.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/pages/Abonnement.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/pages/Success.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/pages/Cancel.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/utils/api.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/utils/helpers.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/hooks/useAuth.js
+
+[⚠️] Fichier non trouvé : frontend-firstarabic/src/context/AuthContext.js
