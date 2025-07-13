@@ -1,4 +1,4 @@
-// src/App.js
+// src/App.js - VERSION PROPRE
 import Professeurs from "./pages/Professeurs";
 import Reservation from "./pages/Reservation";
 import Planning from "./pages/Planning";
@@ -10,6 +10,8 @@ import Login from "./components/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProfDashboard from "./pages/ProfDashboard";
+import ReviewCourse from './pages/ReviewCourse';
+import MyReviews from './pages/MyReviews';
 
 function App() {
   return (
@@ -24,7 +26,8 @@ function App() {
         <Route path="/reservation" element={<Reservation />} />
         <Route path="/professeurs" element={<Professeurs />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        {/* ✅ Pas besoin de /login, la page de connexion est déjà sur / */}
+        <Route path="/review/:coursId" element={<ReviewCourse />} />
+        <Route path="/my-reviews" element={<MyReviews />} />
       </Routes>
     </Router>
   );

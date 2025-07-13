@@ -6,7 +6,7 @@ require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const rateLimit = require("express-rate-limit");
 const authenticateToken = require('./middleware/authenticateToken');
-
+const reviewsRoutes = require("./routes/reviewsRoutes");
 const app = express();
 const PORT = 3001;
 
@@ -45,6 +45,7 @@ app.use('/planning', require('./routes/planningRoutes'));
 app.use('/creneaux', require('./routes/planningRoutes')); // ⚠️ attention doublon possible
 app.use('/check-email', require('./routes/checkEmailRoutes'));
 app.use('/stripe', require('./routes/stripeRoutes'));
+app.use("/reviews", reviewsRoutes);
 // app.use('/auth', require('./routes/authRoutes')); // si activée plus tard
 
 // ✅ Route de test

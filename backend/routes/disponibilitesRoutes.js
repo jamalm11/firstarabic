@@ -33,16 +33,40 @@ router.post("/", async (req, res) => {
 });
 
 // ✅ Récupérer toutes les disponibilités
+
+// ✅ Récupérer toutes les disponibilités (MODIFIÉ pour supporter prof_id)
 router.get("/", async (req, res) => {
   try {
-    const { data, error } = await req.supabase.from("disponibilites").select("*");
+    const { prof_id } = req.query; // 🆕 Récupérer le prof_id depuis les query params
+    
+    let query = req.supabase.from("disponibilites").select("*");
+    
+    // 🆕 Filtrer par prof_id si fourni
+    if (prof_id) {
+      query = query.eq("prof_id", prof_id);
+    }
+    
+    const { data, error } = await query;
     if (error) throw error;
+    
     res.json({ success: true, disponibilites: data });
   } catch (err) {
     console.error("❌ Erreur récupération disponibilités:", err);
     res.status(500).json({ error: "Erreur récupération disponibilités", details: err.message });
   }
 });
+
+
+// router.get("/", async (req, res) => {
+//  try {
+//    const { data, error } = await req.supabase.from("disponibilites").select("*");
+//    if (error) throw error;
+//    res.json({ success: true, disponibilites: data });
+//  } catch (err) {
+//    console.error("❌ Erreur récupération disponibilités:", err);
+//    res.status(500).json({ error: "Erreur récupération disponibilités", details: err.message });
+//  }
+// });
 
 // ✅ Récupérer une disponibilité par ID
 router.get("/:id", async (req, res) => {

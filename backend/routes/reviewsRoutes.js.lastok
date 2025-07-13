@@ -1,0 +1,416 @@
+// backend/routes/reviewsRoutes.js
+const express = require("express");
+const router = express.Router();
+const { createClient } = require("@supabase/supabase-js");
+const Joi = require('joi');
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+
+const initSupabase = (req) =>
+  createClient(supabaseUrl, supabaseKey, {
+    global: { headers: { Authorization: req.headers.authorization } },
+  });
+
+// Schéma de validation pour les reviews
+const reviewSchema = Joi.object({
+  cours_id: Joi.number().integer().required(),
+  rating: Joi.number().integer().min(1).max(5).required(),
+  commentaire: Joi.string().allow('').max(1000).optional(),
+  pedagogie_rating: Joi.number().integer().min(1).max(5).optional(),
+  communication_rating: Joi.number().integer().min(1).max(5).optional(),
+  ponctualite_rating: Joi.number().integer().min(1).max(5).optional(),
+  is_public: Joi.boolean().default(true)
+});
+
+// 📝 Créer une évaluation
+router.post("/", async (req, res) => {
+  console.log("🆕 [POST] /reviews - Création évaluation:", req.body);
+
+  try {
+    // Validation des données
+    const { error: validationError } = reviewSchema.validate(req.body);
+    if (validationError) {
+      return res.status(400).json({ 
+        error: "Données invalides", 
+        details: validationError.details[0].message 
+      });
+    }
+
+    const supabase = initSupabase(req);
+    
+    // Récupérer l'utilisateur connecté
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    const user_id = userData.user.id;
+    const { cours_id, rating, commentaire, pedagogie_rating, communication_rating, ponctualite_rating, is_public } = req.body;
+
+    // Vérifier que l'utilisateur peut évaluer ce cours
+    const { data: canReview, error: canReviewError } = await supabase
+      .rpc('can_review_cours', { 
+        cours_id_param: cours_id, 
+        user_uuid: user_id 
+      });
+
+    if (canReviewError) {
+      console.error("❌ Erreur vérification droits:", canReviewError);
+      return res.status(500).json({ message: "Erreur vérification des droits" });
+    }
+
+    if (!canReview) {
+      return res.status(403).json({ 
+        message: "Vous ne pouvez pas évaluer ce cours (cours non terminé ou déjà évalué)" 
+      });
+    }
+
+    // Récupérer les infos du cours
+    const { data: coursData, error: coursError } = await supabase
+      .from("cours")
+      .select(`
+        id,
+        prof_id,
+        eleve_id,
+        statut,
+        eleves!inner(created_by)
+      `)
+      .eq("id", cours_id)
+      .eq("eleves.created_by", user_id)
+      .single();
+
+    if (coursError || !coursData) {
+      return res.status(404).json({ message: "Cours non trouvé ou non autorisé" });
+    }
+
+    // Créer l'évaluation
+    const { data: reviewData, error: insertError } = await supabase
+      .from("reviews")
+      .insert([{
+        cours_id,
+        prof_id: coursData.prof_id,
+        eleve_id: coursData.eleve_id,
+        rating,
+        commentaire: commentaire || null,
+        pedagogie_rating: pedagogie_rating || null,
+        communication_rating: communication_rating || null,
+        ponctualite_rating: ponctualite_rating || null,
+        is_public: is_public !== false, // Par défaut public
+        is_verified: true // Vérifié car provient d'un cours réel
+      }])
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error("❌ Erreur création review:", insertError);
+      return res.status(500).json({ message: "Erreur création de l'évaluation" });
+    }
+
+    console.log("✅ Évaluation créée avec succès");
+    res.status(201).json({ 
+      success: true, 
+      review: reviewData,
+      message: "Évaluation créée avec succès" 
+    });
+
+  } catch (err) {
+    console.error("❌ Erreur inattendue:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 📋 Récupérer les avis d'un professeur
+router.get("/prof/:prof_id", async (req, res) => {
+  console.log("🔍 [GET] /reviews/prof/:prof_id");
+
+  try {
+    const { prof_id } = req.params;
+    const { limit = 10, offset = 0 } = req.query;
+
+    const supabase = initSupabase(req);
+
+    // Récupérer les avis publics avec infos enrichies
+    const { data: reviews, error } = await supabase
+      .from("reviews_publics")
+      .select("*")
+      .eq("prof_id", prof_id)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      console.error("❌ Erreur récupération reviews:", error);
+      return res.status(500).json({ message: "Erreur récupération des avis" });
+    }
+
+    // Récupérer les stats du professeur
+    const { data: profStats, error: statsError } = await supabase
+      .from("profs")
+      .select(`
+        rating_moyen,
+        nombre_avis,
+        rating_pedagogie,
+        rating_communication,
+        rating_ponctualite
+      `)
+      .eq("id", prof_id)
+      .single();
+
+    if (statsError) {
+      console.error("❌ Erreur stats prof:", statsError);
+    }
+
+    res.json({
+      success: true,
+      reviews,
+      stats: profStats || {
+        rating_moyen: 4.5,
+        nombre_avis: 0,
+        rating_pedagogie: null,
+        rating_communication: null,
+        rating_ponctualite: null
+      },
+      pagination: {
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        has_more: reviews && reviews.length === parseInt(limit)
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Erreur inattendue:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 📋 Récupérer les cours qu'un élève peut évaluer
+router.get("/can-review", async (req, res) => {
+  console.log("🔍 [GET] /reviews/can-review");
+
+  try {
+    const supabase = initSupabase(req);
+    
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    const user_id = userData.user.id;
+
+    // Récupérer les cours terminés non encore évalués
+    const { data: cours, error } = await supabase
+      .from("cours")
+      .select(`
+        id,
+        date,
+        statut,
+        profs!inner(id, nom, photo_url),
+        eleves!inner(created_by)
+      `)
+      .eq("eleves.created_by", user_id)
+      .in("statut", ["terminé", "fini"])
+      .lt("date", new Date().toISOString());
+
+    if (error) {
+      console.error("❌ Erreur récupération cours:", error);
+      return res.status(500).json({ message: "Erreur récupération des cours" });
+    }
+
+    // Filtrer ceux qui n'ont pas encore d'avis
+    const { data: existingReviews, error: reviewsError } = await supabase
+      .from("reviews")
+      .select("cours_id")
+      .in("cours_id", cours?.map(c => c.id) || []);
+
+    if (reviewsError) {
+      console.error("❌ Erreur récupération reviews existantes:", reviewsError);
+    }
+
+    const reviewedCoursIds = new Set(existingReviews?.map(r => r.cours_id) || []);
+    const coursToReview = cours?.filter(c => !reviewedCoursIds.has(c.id)) || [];
+
+    res.json({
+      success: true,
+      cours_to_review: coursToReview
+    });
+
+  } catch (err) {
+    console.error("❌ Erreur inattendue:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 📋 Récupérer les avis d'un élève
+router.get("/my-reviews", async (req, res) => {
+  console.log("🔍 [GET] /reviews/my-reviews");
+
+  try {
+    const supabase = initSupabase(req);
+    
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    const user_id = userData.user.id;
+
+    // Récupérer l'élève connecté
+    const { data: eleveData, error: eleveError } = await supabase
+      .from("eleves")
+      .select("id")
+      .eq("created_by", user_id)
+      .single();
+
+    if (eleveError || !eleveData) {
+      return res.status(404).json({ message: "Profil élève non trouvé" });
+    }
+
+    const { data: reviews, error } = await supabase
+      .from("reviews")
+      .select(`
+        *,
+        profs!inner(nom, photo_url),
+        cours!inner(date)
+      `)
+      .eq("eleve_id", eleveData.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("❌ Erreur récupération mes reviews:", error);
+      return res.status(500).json({ message: "Erreur récupération de vos avis" });
+    }
+
+    res.json({
+      success: true,
+      my_reviews: reviews || []
+    });
+
+  } catch (err) {
+    console.error("❌ Erreur inattendue:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// ✏️ Modifier une évaluation
+router.put("/:review_id", async (req, res) => {
+  console.log("✏️ [PUT] /reviews/:review_id");
+
+  try {
+    const { review_id } = req.params;
+    const { error: validationError } = reviewSchema.validate(req.body);
+    
+    if (validationError) {
+      return res.status(400).json({ 
+        error: "Données invalides", 
+        details: validationError.details[0].message 
+      });
+    }
+
+    const supabase = initSupabase(req);
+    
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    const user_id = userData.user.id;
+    const { rating, commentaire, pedagogie_rating, communication_rating, ponctualite_rating, is_public } = req.body;
+
+    // Vérifier que l'avis appartient à l'utilisateur
+    const { data: existingReview, error: checkError } = await supabase
+      .from("reviews")
+      .select(`
+        id,
+        eleves!inner(created_by)
+      `)
+      .eq("id", review_id)
+      .eq("eleves.created_by", user_id)
+      .single();
+
+    if (checkError || !existingReview) {
+      return res.status(404).json({ message: "Avis non trouvé ou non autorisé" });
+    }
+
+    // Mettre à jour l'avis
+    const { data: updatedReview, error: updateError } = await supabase
+      .from("reviews")
+      .update({
+        rating,
+        commentaire: commentaire || null,
+        pedagogie_rating: pedagogie_rating || null,
+        communication_rating: communication_rating || null,
+        ponctualite_rating: ponctualite_rating || null,
+        is_public: is_public !== false,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", review_id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error("❌ Erreur mise à jour review:", updateError);
+      return res.status(500).json({ message: "Erreur mise à jour de l'évaluation" });
+    }
+
+    res.json({
+      success: true,
+      review: updatedReview,
+      message: "Évaluation mise à jour avec succès"
+    });
+
+  } catch (err) {
+    console.error("❌ Erreur inattendue:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 🗑️ Supprimer une évaluation
+router.delete("/:review_id", async (req, res) => {
+  console.log("🗑️ [DELETE] /reviews/:review_id");
+
+  try {
+    const { review_id } = req.params;
+    const supabase = initSupabase(req);
+    
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    const user_id = userData.user.id;
+
+    // Récupérer l'élève connecté
+    const { data: eleveData, error: eleveError } = await supabase
+      .from("eleves")
+      .select("id")
+      .eq("created_by", user_id)
+      .single();
+
+    if (eleveError || !eleveData) {
+      return res.status(404).json({ message: "Profil élève non trouvé" });
+    }
+
+    // Supprimer l'avis
+    const { error: deleteError } = await supabase
+      .from("reviews")
+      .delete()
+      .eq("id", review_id)
+      .eq("eleve_id", eleveData.id);
+
+    if (deleteError) {
+      console.error("❌ Erreur suppression review:", deleteError);
+      return res.status(500).json({ message: "Erreur suppression de l'évaluation" });
+    }
+
+    res.json({
+      success: true,
+      message: "Évaluation supprimée avec succès"
+    });
+
+  } catch (err) {
+    console.error("❌ Erreur inattendue:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+module.exports = router;

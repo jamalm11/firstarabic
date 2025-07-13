@@ -1,0 +1,390 @@
+/* src/pages/ReviewCourse.css */
+
+.review-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+/* Header */
+.review-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.review-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.review-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Informations du cours */
+.course-info {
+  margin-bottom: 2rem;
+}
+
+.course-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.professor-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.professor-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #667eea;
+  flex-shrink: 0;
+}
+
+.professor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+}
+
+.course-details h3 {
+  font-size: 1.5rem;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.course-date, .course-status {
+  color: #4a5568;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+/* Formulaire d'évaluation */
+.review-form {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.rating-section {
+  margin-bottom: 2.5rem;
+}
+
+.rating-section h3 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Étoiles */
+.star-rating {
+  margin-bottom: 1.5rem;
+}
+
+.rating-label {
+  display: block;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.2rem;
+  border-radius: 8px;
+}
+
+.star:hover:not(.disabled) {
+  transform: scale(1.1);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.star.filled {
+  color: #fbbf24;
+  filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.3));
+}
+
+.star:not(.filled) {
+  color: #d1d5db;
+}
+
+.star.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rating-text {
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Notes détaillées */
+.detailed-ratings {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Commentaire */
+.comment-section {
+  margin-bottom: 2rem;
+}
+
+.comment-section h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.comment-section textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.comment-section textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.character-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 0.5rem;
+}
+
+/* Confidentialité */
+.privacy-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.privacy-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.privacy-option input {
+  margin-right: 0.75rem;
+  transform: scale(1.2);
+  accent-color: #667eea;
+}
+
+.privacy-note {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #10b981, #059669);
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: #f8fafc;
+  color: #4a5568;
+  padding: 1rem 2rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+/* Aide */
+.help-section {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 1.5rem;
+  color: white;
+}
+
+.help-section h4 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.help-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-section li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.help-section li:before {
+  content: "💡";
+  position: absolute;
+  left: 0;
+}
+
+/* États de chargement */
+.loading-state, .error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-state h2 {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.error-state p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .review-container {
+    padding: 1rem;
+  }
+
+  .review-header h1 {
+    font-size: 2rem;
+  }
+
+  .professor-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .professor-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .stars {
+    justify-content: center;
+  }
+
+  .star {
+    font-size: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
+}

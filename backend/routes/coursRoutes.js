@@ -4,7 +4,7 @@ const router = express.Router();
 const { coursSchema } = require("../validators/coursValidator");
 const { createClient } = require("@supabase/supabase-js");
 const supabaseAdmin = require("../supabaseAdminClient");
-
+const authenticateToken = require("../middleware/authenticateToken");
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
@@ -196,6 +196,53 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.error("❌ [Exception] Erreur inattendue dans POST /cours:", err);
     return res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 📋 Récupérer les cours d'un professeur
+router.get("/", authenticateToken, async (req, res) => {
+  console.log("🔍 [GET] /cours pour prof");
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "Utilisateur non authentifié" });
+    }
+
+    // Récupérer le prof connecté
+    const { data: profData, error: profError } = await req.supabase
+      .from("profs")
+      .select("id")
+      .eq("created_by", userId)
+      .single();
+
+    if (profError || !profData) {
+      return res.status(404).json({ message: "Profil professeur non trouvé" });
+    }
+
+    // Récupérer les cours du prof avec infos élève
+    const { data: cours, error } = await req.supabase
+      .from("cours")
+      .select(`
+        *,
+        eleves!inner(nom, email),
+        profs!inner(nom)
+      `)
+      .eq("prof_id", profData.id)
+      .order("date", { ascending: false });
+
+    if (error) {
+      console.error("❌ Erreur récupération cours:", error);
+      return res.status(500).json({ message: "Erreur récupération des cours" });
+    }
+
+    res.json({
+      success: true,
+      cours: cours || []
+    });
+
+  } catch (err) {
+    console.error("❌ Erreur inattendue:", err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 

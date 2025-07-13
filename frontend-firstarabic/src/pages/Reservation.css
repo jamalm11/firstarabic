@@ -1,0 +1,344 @@
+/* src/pages/Reservation.css */
+
+.reservation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+/* Header professeur */
+.professor-header {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.professor-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.professor-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #667eea;
+}
+
+.professor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+}
+
+.professor-details h1 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.specialties {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.specialty-tag {
+  background: #667eea;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.price {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Contenu principal */
+.reservation-content {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Sélecteur de date */
+.date-selector {
+  margin-bottom: 2.5rem;
+}
+
+.date-selector h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.day-button {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 15px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.day-button:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.day-button.selected {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.day-name {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+  opacity: 0.8;
+}
+
+.day-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.day-month {
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  opacity: 0.8;
+}
+
+/* Sélecteur d'heure */
+.time-selector {
+  margin-bottom: 2.5rem;
+}
+
+.time-selector h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.8rem;
+}
+
+.time-button {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.time-button:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+  transform: translateY(-1px);
+}
+
+.time-button.selected {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border-color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+.no-slots {
+  text-align: center;
+  padding: 3rem;
+  color: #6c757d;
+}
+
+.no-slots p {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.no-slots small {
+  color: #adb5bd;
+}
+
+/* Résumé de réservation */
+.reservation-summary {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  padding: 2rem;
+  border: 1px solid #dee2e6;
+}
+
+.reservation-summary h3 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.summary-details {
+  margin-bottom: 2rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item.total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-top: 2px solid #667eea;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.reserve-button {
+  width: 100%;
+  background: linear-gradient(45deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 1.2rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.reserve-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(40, 167, 69, 0.4);
+}
+
+.reserve-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Lien retour */
+.back-link {
+  text-align: center;
+}
+
+.back-link a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.back-link a:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* États de chargement et d'erreur */
+.loading-state, .error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 20px;
+  margin: 2rem auto;
+  max-width: 500px;
+  color: #6c757d;
+  font-size: 1.2rem;
+}
+
+.error-state h2 {
+  color: #dc3545;
+  margin-bottom: 1rem;
+}
+
+.error-state a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.error-state a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reservation-container {
+    padding: 1rem;
+  }
+  
+  .professor-info {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .days-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .time-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .summary-item {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}

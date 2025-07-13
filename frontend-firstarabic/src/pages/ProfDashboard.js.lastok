@@ -1,4 +1,4 @@
-// src/pages/ProfDashboard.js - VERSION FINALE avec vraies données
+// src/pages/ProfessorDashboard.js - Dashboard complet pour professeurs
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
@@ -38,87 +38,49 @@ function ProfDashboard() {
 
       try {
         // 1. Récupérer le profil du prof
-        console.log("🔍 Récupération profil professeur...");
         const profResponse = await axios.get('http://localhost:3001/profs/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
 
         if (profResponse.data.success && profResponse.data.prof) {
-          console.log("✅ Profil professeur récupéré:", profResponse.data.prof);
           setProfProfile(profResponse.data.prof);
 
           // 2. Récupérer les cours du prof
-          try {
-            console.log("🔍 Récupération des cours du prof...");
-            const coursResponse = await axios.get('http://localhost:3001/cours', {
-              headers: { Authorization: `Bearer ${token}` }
-            });
+          const coursResponse = await axios.get('http://localhost:3001/cours', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
 
-            if (coursResponse.data.success) {
-              const cours = coursResponse.data.cours || [];
-              console.log("✅ Cours récupérés:", cours.length);
-              
-              // Calculer les statistiques
-              const now = new Date();
-              const coursAVenir = cours.filter(c => new Date(c.date) > now);
-              const coursFinis = cours.filter(c => new Date(c.date) <= now && c.statut === 'terminé');
-              
-              setProchainsCours(coursAVenir.slice(0, 5));
-              
-              setStats({
-                totalCours: cours.length,
-                coursAVenir: coursAVenir.length,
-                coursFinis: coursFinis.length,
-                evaluations: profResponse.data.prof.nombre_avis || 0,
-                noteMoyenne: profResponse.data.prof.rating_moyen || 0,
-                revenus: coursFinis.length * (profResponse.data.prof.prix_30min || 15)
-              });
-            } else {
-              console.log("⚠️ Pas de cours trouvés, utilisation des données par défaut");
-              setProchainsCours([]);
-              setStats({
-                totalCours: 0,
-                coursAVenir: 0,
-                coursFinis: 0,
-                evaluations: profResponse.data.prof.nombre_avis || 0,
-                noteMoyenne: profResponse.data.prof.rating_moyen || 0,
-                revenus: 0
-              });
-            }
-          } catch (coursError) {
-            console.log("⚠️ Erreur récupération cours, utilisation des données par défaut:", coursError.message);
-            setProchainsCours([]);
+          if (coursResponse.data.success) {
+            const cours = coursResponse.data.cours || [];
+            
+            // Calculer les statistiques
+            const now = new Date();
+            const coursAVenir = cours.filter(c => new Date(c.date) > now);
+            const coursFinis = cours.filter(c => new Date(c.date) <= now && c.statut === 'terminé');
+            
+            setProchainsCours(coursAVenir.slice(0, 5)); // 5 prochains cours
+            
             setStats({
-              totalCours: 0,
-              coursAVenir: 0,
-              coursFinis: 0,
+              totalCours: cours.length,
+              coursAVenir: coursAVenir.length,
+              coursFinis: coursFinis.length,
               evaluations: profResponse.data.prof.nombre_avis || 0,
               noteMoyenne: profResponse.data.prof.rating_moyen || 0,
-              revenus: 0
+              revenus: coursFinis.length * (profResponse.data.prof.prix_30min || 15)
             });
           }
 
           // 3. Récupérer les évaluations récentes
-          try {
-            console.log("🔍 Récupération des évaluations...");
-            const reviewsResponse = await axios.get(`http://localhost:3001/reviews/prof/${profResponse.data.prof.id}?limit=3`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
+          const reviewsResponse = await axios.get(`http://localhost:3001/reviews/prof/${profResponse.data.prof.id}?limit=3`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
 
-            if (reviewsResponse.data.success) {
-              console.log("✅ Évaluations récupérées:", reviewsResponse.data.reviews.length);
-              setRecentEvaluations(reviewsResponse.data.reviews || []);
-            } else {
-              console.log("⚠️ Pas d'évaluations trouvées");
-              setRecentEvaluations([]);
-            }
-          } catch (reviewError) {
-            console.log("⚠️ Erreur récupération évaluations:", reviewError.message);
-            setRecentEvaluations([]);
+          if (reviewsResponse.data.success) {
+            setRecentEvaluations(reviewsResponse.data.reviews || []);
           }
         }
       } catch (err) {
-        console.error("❌ Erreur récupération données prof:", err);
+        console.error("Erreur récupération données prof:", err);
       } finally {
         setLoading(false);
       }
@@ -250,30 +212,29 @@ function ProfDashboard() {
       <div className="quick-actions">
         <h3>🚀 Actions rapides</h3>
         <div className="actions-grid">
-          {/* TEMPORAIRE - Liens désactivés en attendant les pages */}
-          <div className="action-card disabled">
+          <Link to="/prof/disponibilites" className="action-card">
             <div className="action-icon">🗓️</div>
             <div className="action-title">Gérer mes disponibilités</div>
-            <div className="action-subtitle">Bientôt disponible</div>
-          </div>
+            <div className="action-subtitle">Définir mes créneaux libres</div>
+          </Link>
           
-          <div className="action-card disabled">
+          <Link to="/prof/profile" className="action-card">
             <div className="action-icon">👤</div>
             <div className="action-title">Modifier mon profil</div>
-            <div className="action-subtitle">Bientôt disponible</div>
-          </div>
+            <div className="action-subtitle">Photo, bio, spécialités</div>
+          </Link>
           
-          <div className="action-card disabled">
+          <Link to={`/professeur/${profProfile?.id}`} className="action-card">
             <div className="action-icon">👁️</div>
             <div className="action-title">Voir mon profil public</div>
-            <div className="action-subtitle">Bientôt disponible</div>
-          </div>
+            <div className="action-subtitle">Ce que voient les élèves</div>
+          </Link>
           
-          <div className="action-card disabled">
+          <Link to="/prof/revenus" className="action-card">
             <div className="action-icon">💰</div>
             <div className="action-title">Mes revenus</div>
-            <div className="action-subtitle">Bientôt disponible</div>
-          </div>
+            <div className="action-subtitle">Historique et paiements</div>
+          </Link>
         </div>
       </div>
 
@@ -298,7 +259,7 @@ function ProfDashboard() {
                   <div className="course-status">{cours.statut}</div>
                 </div>
                 <div className="course-details">
-                  <div className="student-name">👤 {cours.eleves?.nom || cours.eleve_nom || 'Élève'}</div>
+                  <div className="student-name">👤 {cours.eleve_nom}</div>
                   <div className="course-link">
                     {cours.jitsi_url && (
                       <a href={cours.jitsi_url} target="_blank" rel="noopener noreferrer" className="join-link">
@@ -317,14 +278,13 @@ function ProfDashboard() {
       <div className="recent-reviews">
         <div className="section-header">
           <h3>⭐ Évaluations récentes</h3>
-          {/* TEMPORAIRE - Lien désactivé */}
-          <span className="view-all disabled">Bientôt disponible</span>
+          <Link to={`/reviews/prof/${profProfile?.id}`} className="view-all">Voir toutes →</Link>
         </div>
         
         {recentEvaluations.length === 0 ? (
           <div className="empty-state">
-            <p>📝 {stats.evaluations > 0 ? 'Évaluations bientôt visibles' : 'Aucune évaluation pour le moment'}</p>
-            <p>{stats.evaluations > 0 ? `Vous avez ${stats.evaluations} évaluation(s) avec une note moyenne de ${stats.noteMoyenne.toFixed(1)}/5` : 'Les avis de vos élèves apparaîtront ici'}</p>
+            <p>📝 Aucune évaluation pour le moment</p>
+            <p>Les avis de vos élèves apparaîtront ici</p>
           </div>
         ) : (
           <div className="reviews-list">
@@ -332,7 +292,7 @@ function ProfDashboard() {
               <div key={review.id} className="review-card">
                 <div className="review-header">
                   <div className="student-info">
-                    <strong>{review.eleve_nom_anonyme || review.eleve_nom || 'Élève'}</strong>
+                    <strong>{review.eleve_nom_anonyme || 'Élève'}</strong>
                     <StarDisplay rating={review.rating} />
                   </div>
                   <div className="review-date">
@@ -350,9 +310,6 @@ function ProfDashboard() {
                   )}
                   {review.communication_rating && (
                     <span className="detail-rating">Communication: {review.communication_rating}/5</span>
-                  )}
-                  {review.ponctualite_rating && (
-                    <span className="detail-rating">Ponctualité: {review.ponctualite_rating}/5</span>
                   )}
                 </div>
               </div>
