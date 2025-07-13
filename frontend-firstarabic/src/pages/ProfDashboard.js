@@ -1,4 +1,4 @@
-// src/pages/ProfDashboard.js - VERSION FINALE avec vraies données
+// src/pages/ProfDashboard.js - VERSION avec AUTO-CRÉATION de profil
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
@@ -20,6 +20,7 @@ function ProfDashboard() {
   const [prochainsCours, setProchainsCours] = useState([]);
   const [recentEvaluations, setRecentEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCreatingProfile, setIsCreatingProfile] = useState(false); // 🆕 État de création
 
   // Récupération de la session
   useEffect(() => {
@@ -46,86 +47,182 @@ function ProfDashboard() {
         if (profResponse.data.success && profResponse.data.prof) {
           console.log("✅ Profil professeur récupéré:", profResponse.data.prof);
           setProfProfile(profResponse.data.prof);
-
-          // 2. Récupérer les cours du prof
-          try {
-            console.log("🔍 Récupération des cours du prof...");
-            const coursResponse = await axios.get('http://localhost:3001/cours', {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (coursResponse.data.success) {
-              const cours = coursResponse.data.cours || [];
-              console.log("✅ Cours récupérés:", cours.length);
-              
-              // Calculer les statistiques
-              const now = new Date();
-              const coursAVenir = cours.filter(c => new Date(c.date) > now);
-              const coursFinis = cours.filter(c => new Date(c.date) <= now && c.statut === 'terminé');
-              
-              setProchainsCours(coursAVenir.slice(0, 5));
-              
-              setStats({
-                totalCours: cours.length,
-                coursAVenir: coursAVenir.length,
-                coursFinis: coursFinis.length,
-                evaluations: profResponse.data.prof.nombre_avis || 0,
-                noteMoyenne: profResponse.data.prof.rating_moyen || 0,
-                revenus: coursFinis.length * (profResponse.data.prof.prix_30min || 15)
-              });
-            } else {
-              console.log("⚠️ Pas de cours trouvés, utilisation des données par défaut");
-              setProchainsCours([]);
-              setStats({
-                totalCours: 0,
-                coursAVenir: 0,
-                coursFinis: 0,
-                evaluations: profResponse.data.prof.nombre_avis || 0,
-                noteMoyenne: profResponse.data.prof.rating_moyen || 0,
-                revenus: 0
-              });
-            }
-          } catch (coursError) {
-            console.log("⚠️ Erreur récupération cours, utilisation des données par défaut:", coursError.message);
-            setProchainsCours([]);
-            setStats({
-              totalCours: 0,
-              coursAVenir: 0,
-              coursFinis: 0,
-              evaluations: profResponse.data.prof.nombre_avis || 0,
-              noteMoyenne: profResponse.data.prof.rating_moyen || 0,
-              revenus: 0
-            });
-          }
-
-          // 3. Récupérer les évaluations récentes
-          try {
-            console.log("🔍 Récupération des évaluations...");
-            const reviewsResponse = await axios.get(`http://localhost:3001/reviews/prof/${profResponse.data.prof.id}?limit=3`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (reviewsResponse.data.success) {
-              console.log("✅ Évaluations récupérées:", reviewsResponse.data.reviews.length);
-              setRecentEvaluations(reviewsResponse.data.reviews || []);
-            } else {
-              console.log("⚠️ Pas d'évaluations trouvées");
-              setRecentEvaluations([]);
-            }
-          } catch (reviewError) {
-            console.log("⚠️ Erreur récupération évaluations:", reviewError.message);
-            setRecentEvaluations([]);
-          }
+          await loadCoursesAndReviews(profResponse.data.prof);
+          
+        } else if (profResponse.data.success && !profResponse.data.prof) {
+          // 🆕 AUCUN PROFIL TROUVÉ - Auto-création
+          console.log("🆕 Aucun profil trouvé, création automatique...");
+          await createProfesseurProfile();
+          
+        } else {
+          console.log("❌ Erreur récupération profil:", profResponse.data);
+          throw new Error("Erreur récupération profil");
         }
+        
       } catch (err) {
         console.error("❌ Erreur récupération données prof:", err);
+        // 🆕 En cas d'erreur 404, tenter la création automatique
+        if (err.response?.status === 404 || err.response?.status === 401) {
+          console.log("🔧 Tentative de création automatique suite à erreur...");
+          await createProfesseurProfile();
+        }
       } finally {
         setLoading(false);
+        setIsCreatingProfile(false);
+      }
+    };
+
+    // 🆕 Fonction pour créer automatiquement un profil professeur
+    const createProfesseurProfile = async () => {
+      if (isCreatingProfile) return; // Éviter les appels multiples
+      
+      setIsCreatingProfile(true);
+      console.log("🛠️ Création automatique du profil professeur...");
+      
+      try {
+        // Extraire le nom depuis les métadonnées ou l'email
+        const userMetadata = session?.user?.user_metadata || {};
+        const email = session?.user?.email || '';
+        
+        const nom = userMetadata.full_name || 
+                   userMetadata.name || 
+                   email.split('@')[0].replace(/[^a-zA-Z0-9]/g, ' ') || 
+                   'Professeur';
+
+        const profileData = {
+          nom: nom,
+          specialite: 'Arabe général',
+          bio: `Professeur d'arabe passionné. Rejoint FirstArabic pour partager ses connaissances et aider les élèves à maîtriser la langue arabe.`,
+          specialites: ['Arabe général', 'Conversation'],
+          langues_parlees: ['Arabe', 'Français'],
+          prix_30min: 15.00,
+          prix_60min: 25.00,
+          experience_annees: 1,
+          pays_origine: 'Maroc',
+          disponible_maintenant: false
+        };
+
+        console.log("📤 Données profil à créer:", profileData);
+
+        const createResponse = await axios.post('http://localhost:3001/profs', profileData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (createResponse.data.success && createResponse.data.prof) {
+          console.log("✅ Profil professeur créé automatiquement:", createResponse.data.prof);
+          setProfProfile(createResponse.data.prof);
+          
+          // Charger les données liées (cours et avis) - seront vides mais structure prête
+          await loadCoursesAndReviews(createResponse.data.prof);
+          
+          // Message de succès (optionnel)
+          console.log("🎉 Bienvenue ! Votre profil professeur a été créé automatiquement.");
+          
+        } else {
+          console.error("❌ Échec création profil:", createResponse.data);
+          throw new Error("Échec création profil automatique");
+        }
+        
+      } catch (createError) {
+        console.error("❌ Erreur création profil automatique:", createError);
+        
+        // Fallback : afficher un message d'erreur mais ne pas bloquer l'interface
+        setStats({
+          totalCours: 0,
+          coursAVenir: 0,
+          coursFinis: 0,
+          evaluations: 0,
+          noteMoyenne: 0,
+          revenus: 0
+        });
+        
+        // Profil minimal pour éviter les erreurs d'affichage
+        setProfProfile({
+          nom: session?.user?.email?.split('@')[0] || 'Professeur',
+          email: session?.user?.email,
+          is_validated: false,
+          rating_moyen: 0,
+          nombre_avis: 0,
+          prix_30min: 15
+        });
+      }
+    };
+
+    // 🔄 Fonction pour charger cours et évaluations
+    const loadCoursesAndReviews = async (profData) => {
+      // 2. Récupérer les cours du prof
+      try {
+        console.log("🔍 Récupération des cours du prof...");
+        const coursResponse = await axios.get('http://localhost:3001/cours', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (coursResponse.data.success) {
+          const cours = coursResponse.data.cours || [];
+          console.log("✅ Cours récupérés:", cours.length);
+          
+          // Calculer les statistiques
+          const now = new Date();
+          const coursAVenir = cours.filter(c => new Date(c.date) > now);
+          const coursFinis = cours.filter(c => new Date(c.date) <= now && c.statut === 'terminé');
+          
+          setProchainsCours(coursAVenir.slice(0, 5));
+          
+          setStats({
+            totalCours: cours.length,
+            coursAVenir: coursAVenir.length,
+            coursFinis: coursFinis.length,
+            evaluations: profData.nombre_avis || 0,
+            noteMoyenne: profData.rating_moyen || 0,
+            revenus: coursFinis.length * (profData.prix_30min || 15)
+          });
+        } else {
+          console.log("⚠️ Pas de cours trouvés, utilisation des données par défaut");
+          setProchainsCours([]);
+          setStats({
+            totalCours: 0,
+            coursAVenir: 0,
+            coursFinis: 0,
+            evaluations: profData.nombre_avis || 0,
+            noteMoyenne: profData.rating_moyen || 0,
+            revenus: 0
+          });
+        }
+      } catch (coursError) {
+        console.log("⚠️ Erreur récupération cours:", coursError.message);
+        setProchainsCours([]);
+        setStats({
+          totalCours: 0,
+          coursAVenir: 0,
+          coursFinis: 0,
+          evaluations: profData.nombre_avis || 0,
+          noteMoyenne: profData.rating_moyen || 0,
+          revenus: 0
+        });
+      }
+
+      // 3. Récupérer les évaluations récentes
+      try {
+        console.log("🔍 Récupération des évaluations...");
+        const reviewsResponse = await axios.get(`http://localhost:3001/reviews/prof/${profData.id}?limit=3`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (reviewsResponse.data.success) {
+          console.log("✅ Évaluations récupérées:", reviewsResponse.data.reviews.length);
+          setRecentEvaluations(reviewsResponse.data.reviews || []);
+        } else {
+          console.log("⚠️ Pas d'évaluations trouvées");
+          setRecentEvaluations([]);
+        }
+      } catch (reviewError) {
+        console.log("⚠️ Erreur récupération évaluations:", reviewError.message);
+        setRecentEvaluations([]);
       }
     };
 
     fetchProfData();
-  }, [token]);
+  }, [token, session]); // 🆕 Ajout de session dans les dépendances
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -156,11 +253,22 @@ function ProfDashboard() {
     return <div className="stars-display">{stars}</div>;
   };
 
-  if (loading) return (
+  // 🆕 État de chargement amélioré
+  if (loading || isCreatingProfile) return (
     <div className="prof-dashboard-container">
       <div className="loading-state">
         <div className="spinner"></div>
-        <p>Chargement de votre dashboard...</p>
+        <p>
+          {isCreatingProfile 
+            ? "✨ Création de votre profil professeur..." 
+            : "Chargement de votre dashboard..."
+          }
+        </p>
+        {isCreatingProfile && (
+          <p style={{marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.8}}>
+            Première connexion détectée, initialisation en cours...
+          </p>
+        )}
       </div>
     </div>
   );
@@ -169,6 +277,22 @@ function ProfDashboard() {
 
   return (
     <div className="prof-dashboard-container">
+      
+      {/* 🆕 Bannière nouveau profil */}
+      {profProfile && !profProfile.is_validated && (
+        <div className="welcome-banner">
+          <div className="banner-content">
+            <div className="banner-icon">🎉</div>
+            <div className="banner-text">
+              <h3>Bienvenue sur FirstArabic !</h3>
+              <p>Votre profil professeur a été créé. Il sera visible par les élèves après validation par notre équipe.</p>
+            </div>
+            <div className="banner-action">
+              <span className="status-badge">⏳ En attente de validation</span>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Header avec profil */}
       <div className="dashboard-header">
