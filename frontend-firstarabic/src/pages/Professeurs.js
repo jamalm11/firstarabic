@@ -1,9 +1,12 @@
-// src/pages/Professeurs.js - VERSION ENRICHIE avec avis et notes
+// src/pages/Professeurs.js - VERSION ENRICHIE avec réservation
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { supabase } from '../supabaseClient';
-import './Professeurs.css'; // Fichier CSS existant
+import './Professeurs.css';
+
+// 🆕 Import du composant de réservation
+import BookingInterface from '../components/BookingInterface';
 
 function Professeurs() {
   const [professors, setProfessors] = useState([]);
@@ -18,7 +21,21 @@ function Professeurs() {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [sortBy, setSortBy] = useState('rating'); // rating, price, experience
-  const [minRating, setMinRating] = useState(0); // 🆕 Nouveau filtre par note
+  const [minRating, setMinRating] = useState(0); // Nouveau filtre par note
+
+  // 🆕 États pour la réservation
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedProfForBooking, setSelectedProfForBooking] = useState(null);
+  const [userSession, setUserSession] = useState(null);
+
+  // 🆕 Récupérer la session utilisateur
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUserSession(session);
+    };
+    getSession();
+  }, []);
 
   // Récupérer session et professeurs (votre code existant adapté)
   useEffect(() => {
@@ -84,7 +101,7 @@ function Professeurs() {
       return prix >= priceRange[0] && prix <= priceRange[1];
     });
 
-    // 🆕 Filtre par note minimum
+    // Filtre par note minimum
     if (minRating > 0) {
       filtered = filtered.filter(prof => (prof.rating_moyen || 0) >= minRating);
     }
@@ -112,6 +129,28 @@ function Professeurs() {
     setFilteredProfs(filtered);
   }, [professors, searchTerm, selectedSpecialty, selectedLanguage, priceRange, onlyAvailable, sortBy, minRating]);
 
+  // 🆕 Fonction pour ouvrir la modal de réservation
+  const handleBookingClick = (prof) => {
+    if (!userSession) {
+      alert('Veuillez vous connecter pour réserver un cours');
+      return;
+    }
+    setSelectedProfForBooking(prof);
+    setShowBookingModal(true);
+  };
+
+  // 🆕 Fonction pour fermer la modal
+  const handleCloseBooking = () => {
+    setShowBookingModal(false);
+    setSelectedProfForBooking(null);
+  };
+
+  // 🆕 Vérifier si l'utilisateur est un élève
+  const isStudent = () => {
+    return userSession?.user?.user_metadata?.role === 'eleve' || 
+           userSession?.user?.user_metadata?.role !== 'prof';
+  };
+
   // Extraire toutes les spécialités uniques
   const allSpecialties = [...new Set(
     professors.flatMap(prof => prof.specialites || [prof.specialite]).filter(Boolean)
@@ -136,7 +175,7 @@ function Professeurs() {
     return `Il y a ${Math.round(diffMinutes / 1440)} jour(s)`;
   };
 
-  // 🆕 Fonction pour afficher les étoiles
+  // Fonction pour afficher les étoiles
   const StarDisplay = ({ rating, size = 'normal' }) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -154,7 +193,7 @@ function Professeurs() {
     return <div className="stars-display">{stars}</div>;
   };
 
-  // 🆕 Badge recommandé
+  // Badge recommandé
   const getRecommendedBadge = (prof) => {
     const rating = prof.rating_moyen || 0;
     const reviews = prof.nombre_avis || 0;
@@ -232,7 +271,7 @@ function Professeurs() {
             ))}
           </select>
 
-          {/* 🆕 Note minimum */}
+          {/* Note minimum */}
           <select
             value={minRating}
             onChange={(e) => setMinRating(parseFloat(e.target.value))}
@@ -327,7 +366,7 @@ function Professeurs() {
                 </div>
               </div>
 
-              {/* 🆕 Rating et avis enrichis */}
+              {/* Rating et avis enrichis */}
               <div className="professor-stats">
                 <div className="rating-section">
                   <StarDisplay rating={prof.rating_moyen || 4.5} />
@@ -372,14 +411,24 @@ function Professeurs() {
                 </div>
               )}
 
-              {/* Boutons d'action */}
+              {/* 🆕 Boutons d'action MODIFIÉS */}
               <div className="professor-actions">
-                <Link
-                  to={`/reservation?prof_id=${prof.id}`}
-                  className="btn-primary"
-                >
-                  📅 Réserver un cours
-                </Link>
+                {/* 🆕 Bouton de réservation avec modal */}
+                {isStudent() ? (
+                  <button
+                    onClick={() => handleBookingClick(prof)}
+                    className="btn-primary"
+                  >
+                    🎓 Réserver un cours
+                  </button>
+                ) : (
+                  <Link
+                    to={`/reservation?prof_id=${prof.id}`}
+                    className="btn-primary"
+                  >
+                    📅 Réserver un cours
+                  </Link>
+                )}
                 
                 <Link
                   to={`/professeur/${prof.id}`}
@@ -423,6 +472,15 @@ function Professeurs() {
           </div>
         </div>
       </div>
+
+      {/* 🆕 Modal de réservation */}
+      {showBookingModal && selectedProfForBooking && (
+        <BookingInterface
+          profId={selectedProfForBooking.id}
+          profData={selectedProfForBooking}
+          onClose={handleCloseBooking}
+        />
+      )}
     </div>
   );
 }

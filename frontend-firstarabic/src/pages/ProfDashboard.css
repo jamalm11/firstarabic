@@ -1,4 +1,4 @@
-/* src/pages/ProfDashboard.css - VERSION COMPLÈTE avec bannière */
+/* src/pages/ProfDashboard.css - VERSION AVEC ONGLETS VISIBLES */
 
 .prof-dashboard-container {
   max-width: 1200px;
@@ -157,6 +157,65 @@
   letter-spacing: 0.5px;
 }
 
+/* 🔥 ONGLETS SUPER VISIBLES */
+.dashboard-tabs {
+  display: flex;
+  background: white;
+  border-radius: 15px;
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  gap: 0.5rem;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 60px;
+}
+
+.tab-button:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+  color: #4a5568;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+}
+
+.tab-button.active:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.tab-content {
+  width: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Grille de statistiques */
 .stats-grid {
   display: grid;
@@ -240,6 +299,7 @@
   text-decoration: none;
   transition: all 0.3s ease;
   display: block;
+  cursor: pointer;
 }
 
 .action-card:hover:not(.disabled) {
@@ -612,6 +672,18 @@
     gap: 1rem;
   }
 
+  /* 🔥 Onglets responsive */
+  .dashboard-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tab-button {
+    font-size: 0.9rem;
+    padding: 0.8rem 1rem;
+    min-height: 50px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
@@ -661,5 +733,10 @@
 
   .actions-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tab-button {
+    font-size: 0.95rem;
+    padding: 0.9rem 1.2rem;
   }
 }
