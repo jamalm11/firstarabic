@@ -22,7 +22,7 @@ const ReservationsDashboard = ({ token: propToken }) => {
       }
     };
     getToken();
-  }, [propToken]);
+  }, [propToken, token]);
 
   useEffect(() => {
     if (token) {
@@ -62,7 +62,7 @@ const ReservationsDashboard = ({ token: propToken }) => {
 
   const handleConfirmReservation = async (reservationId) => {
     try {
-      const token = localStorage.getItem('token');
+      // 🔧 CORRECTION : Utiliser le token Supabase au lieu de localStorage
       const response = await fetch(`http://localhost:3001/booking/reservations/${reservationId}/confirm`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
@@ -86,7 +86,7 @@ const ReservationsDashboard = ({ token: propToken }) => {
     if (motif === null) return; // Annulé
 
     try {
-      const token = localStorage.getItem('token');
+      // 🔧 CORRECTION : Utiliser le token Supabase au lieu de localStorage
       const response = await fetch(`http://localhost:3001/booking/reservations/${reservationId}/refuse`, {
         method: 'PUT',
         headers: {
@@ -113,7 +113,7 @@ const ReservationsDashboard = ({ token: propToken }) => {
     if (!window.confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) return;
 
     try {
-      const token = localStorage.getItem('token');
+      // 🔧 CORRECTION : Utiliser le token Supabase au lieu de localStorage
       const response = await fetch(`http://localhost:3001/booking/reservations/${reservationId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }

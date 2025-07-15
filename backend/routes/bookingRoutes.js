@@ -1,4 +1,4 @@
-// backend/routes/bookingRoutes.js - Routes pour le système de réservation
+// backend/routes/bookingRoutes.js - Routes pour le système de réservation - VERSION FINALE
 const express = require("express");
 const router = express.Router();
 const { createClient } = require("@supabase/supabase-js");
@@ -195,7 +195,7 @@ router.delete("/availability/:id", authenticateToken, async (req, res) => {
 // ROUTES POUR LES RÉSERVATIONS
 // ========================================
 
-// 📝 POST /reservations - Créer une demande de réservation (ÉLÈVE)
+// 📝 POST /reservations - Créer une demande de réservation (ÉLÈVE) - VERSION FINALE CORRIGÉE
 router.post("/reservations", authenticateToken, async (req, res) => {
   console.log("📝 Création réservation:", req.body);
   try {
@@ -203,17 +203,51 @@ router.post("/reservations", authenticateToken, async (req, res) => {
     if (validationError) return res.status(400).json({ error: validationError.details[0].message });
 
     const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    const userMetadata = req.user?.user_metadata || {};
+    
     if (!userId) return res.status(401).json({ error: "Utilisateur non authentifié" });
 
-    // Récupérer l'ID de l'élève
-    const { data: eleve, error: eleveError } = await req.supabase
+    console.log("🔍 Recherche élève pour userId:", userId);
+
+    // 🔧 CORRECTION : Vérifier si l'élève existe, sinon le créer automatiquement
+    let { data: eleve, error: eleveError } = await req.supabase
       .from("eleves")
       .select("id")
       .eq("created_by", userId)
-      .single();
+      .maybeSingle(); // 🔧 Utiliser maybeSingle au lieu de single
 
-    if (eleveError || !eleve) {
-      return res.status(403).json({ error: "Seuls les élèves peuvent faire des réservations" });
+    // 🆕 Si l'élève n'existe pas, le créer automatiquement
+    if (!eleve) {
+      console.log("🆕 Élève non trouvé, création automatique...");
+      
+      // Extraire le nom depuis les métadonnées ou l'email
+      const nom = userMetadata.full_name || 
+                 userMetadata.name || 
+                 userEmail?.split('@')[0]?.replace(/[^a-zA-Z0-9]/g, ' ') || 
+                 'Élève';
+
+      const { data: newEleve, error: createError } = await req.supabase
+        .from("eleves")
+        .insert([{
+          nom: nom,
+          email: userEmail,
+          created_by: userId,
+          niveau_arabe: 'débutant',
+          date_inscription: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (createError) {
+        console.error("❌ Erreur création élève:", createError);
+        return res.status(500).json({ error: "Erreur création profil élève", details: createError.message });
+      }
+
+      eleve = newEleve;
+      console.log("✅ Élève créé automatiquement:", eleve.id);
+    } else {
+      console.log("✅ Élève existant trouvé:", eleve.id);
     }
 
     const { prof_id, date, heure_debut, duree_minutes, message_eleve } = req.body;
@@ -223,11 +257,39 @@ router.post("/reservations", authenticateToken, async (req, res) => {
     heure_fin.setMinutes(heure_fin.getMinutes() + (duree_minutes || 30));
     const heure_fin_str = heure_fin.toISOString().slice(11, 16);
 
-    // Vérifier que la date n'est pas dans le passé
+    // 🆕 CORRECTION COMPLÈTE : Vérifier les dates ET heures passées
     const dateReservation = new Date(date);
     const maintenant = new Date();
+    
+    // Vérifier que la date n'est pas dans le passé
     if (dateReservation < maintenant.setHours(0, 0, 0, 0)) {
       return res.status(400).json({ error: "Impossible de réserver dans le passé" });
+    }
+    
+    // 🆕 NOUVEAU : Si c'est aujourd'hui, vérifier que l'heure n'est pas passée
+    const aujourdhui = new Date();
+    aujourdhui.setHours(0, 0, 0, 0);
+    const dateReservationJour = new Date(dateReservation);
+    dateReservationJour.setHours(0, 0, 0, 0);
+    
+    if (dateReservationJour.getTime() === aujourdhui.getTime()) {
+      // C'est aujourd'hui, vérifier l'heure
+      const [heures, minutes] = heure_debut.split(':').map(Number);
+      const heureReservation = new Date();
+      heureReservation.setHours(heures, minutes, 0, 0);
+      
+      const maintenant30min = new Date(Date.now() + (30 * 60 * 1000)); // +30 minutes
+      
+      if (heureReservation <= maintenant30min) {
+        console.log(`❌ Créneau ${heure_debut} refusé - trop proche ou passé (maintenant: ${new Date().toTimeString().slice(0,5)})`);
+        return res.status(400).json({ 
+          error: "Impossible de réserver à une heure passée ou trop proche (minimum 30 minutes à l'avance)",
+          heure_demandee: heure_debut,
+          heure_minimale: maintenant30min.toTimeString().slice(0,5)
+        });
+      }
+      
+      console.log(`✅ Créneau ${heure_debut} accepté (maintenant: ${new Date().toTimeString().slice(0,5)}, minimum: ${maintenant30min.toTimeString().slice(0,5)})`);
     }
 
     // Vérifier la disponibilité du prof
@@ -294,7 +356,7 @@ router.post("/reservations", authenticateToken, async (req, res) => {
         title: 'Nouvelle demande de cours',
         related_id: data[0].id,
         user_type: 'prof',
-        created_by: userId // Temporaire, en attendant une meilleure logique
+        created_by: userId
       }]);
 
     console.log("✅ Réservation créée:", data[0].id);
@@ -493,7 +555,7 @@ router.delete("/reservations/:id", authenticateToken, async (req, res) => {
 // ROUTES UTILITAIRES
 // ========================================
 
-// 🔍 GET /availability/slots/:profId/:date - Créneaux disponibles pour une date
+// 🔍 GET /availability/slots/:profId/:date - Créneaux disponibles pour une date - VERSION CORRIGÉE
 router.get("/availability/slots/:profId/:date", async (req, res) => {
   console.log("🔍 Créneaux disponibles pour:", req.params);
   try {
@@ -501,8 +563,24 @@ router.get("/availability/slots/:profId/:date", async (req, res) => {
     const { duree } = req.query; // durée en minutes (30 ou 60)
     const dureeDemandee = parseInt(duree) || 30;
 
-    // Récupérer le jour de la semaine
+    // 🆕 Vérifier si la date est dans le passé
     const dateObj = new Date(date);
+    const maintenant = new Date();
+    const aujourdhui = new Date(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate());
+    const dateReservation = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+
+    if (dateReservation < aujourdhui) {
+      console.log("❌ Date dans le passé, aucun créneau disponible");
+      return res.json({ 
+        success: true, 
+        creneaux: [],
+        date,
+        duree_minutes: dureeDemandee,
+        message: "Aucun créneau disponible pour une date passée"
+      });
+    }
+
+    // Récupérer le jour de la semaine
     const joursSemaine = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
     const nomJour = joursSemaine[dateObj.getDay()];
 
@@ -524,6 +602,17 @@ router.get("/availability/slots/:profId/:date", async (req, res) => {
       .eq("date", date)
       .in("statut", ["en_attente", "confirmé"]);
 
+    // 🆕 Calculer l'heure minimale (maintenant + 30 minutes si c'est aujourd'hui)
+    let heureMinimale = null;
+    const estAujourdhui = dateReservation.getTime() === aujourdhui.getTime();
+    
+    if (estAujourdhui) {
+      // Si c'est aujourd'hui, heure minimale = maintenant + 30 minutes
+      const maintenant30min = new Date(maintenant.getTime() + (30 * 60 * 1000));
+      heureMinimale = maintenant30min.toTimeString().slice(0, 5); // Format HH:MM
+      console.log(`📅 Réservation pour aujourd'hui, heure minimale: ${heureMinimale}`);
+    }
+
     // Générer les créneaux disponibles
     const creneauxDisponibles = [];
     
@@ -537,12 +626,19 @@ router.get("/availability/slots/:profId/:date", async (req, res) => {
         const creneauDebut = current.toISOString().slice(11, 16);
         const creneauFin = new Date(current.getTime() + (dureeDemandee * 60 * 1000)).toISOString().slice(11, 16);
         
+        // 🆕 Vérifier si le créneau n'est pas dans le passé (pour aujourd'hui)
+        let creneauValide = true;
+        if (estAujourdhui && heureMinimale && creneauDebut < heureMinimale) {
+          creneauValide = false;
+          console.log(`⏰ Créneau ${creneauDebut} ignoré (passé ou trop proche)`);
+        }
+        
         // Vérifier si ce créneau n'est pas déjà réservé
         const estReserve = reservations?.some(res => {
           return (creneauDebut < res.heure_fin && creneauFin > res.heure_debut);
         });
 
-        if (!estReserve) {
+        if (creneauValide && !estReserve) {
           creneauxDisponibles.push({
             heure_debut: creneauDebut,
             heure_fin: creneauFin,
@@ -559,7 +655,9 @@ router.get("/availability/slots/:profId/:date", async (req, res) => {
       success: true, 
       creneaux: creneauxDisponibles,
       date,
-      duree_minutes: dureeDemandee
+      duree_minutes: dureeDemandee,
+      est_aujourdhui: estAujourdhui,
+      heure_minimale: heureMinimale
     });
   } catch (e) {
     console.error("❌ Erreur récupération créneaux:", e.message);

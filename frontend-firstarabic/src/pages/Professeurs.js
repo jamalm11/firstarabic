@@ -1,4 +1,4 @@
-// src/pages/Professeurs.js - VERSION ENRICHIE avec réservation
+// src/pages/Professeurs.js - VERSION FINALE CORRIGÉE
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -33,6 +33,7 @@ function Professeurs() {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUserSession(session);
+      console.log("🔍 Session utilisateur:", session?.user?.user_metadata?.role);
     };
     getSession();
   }, []);
@@ -135,6 +136,7 @@ function Professeurs() {
       alert('Veuillez vous connecter pour réserver un cours');
       return;
     }
+    console.log("🎓 Ouverture réservation pour:", prof.nom);
     setSelectedProfForBooking(prof);
     setShowBookingModal(true);
   };
@@ -143,12 +145,6 @@ function Professeurs() {
   const handleCloseBooking = () => {
     setShowBookingModal(false);
     setSelectedProfForBooking(null);
-  };
-
-  // 🆕 Vérifier si l'utilisateur est un élève
-  const isStudent = () => {
-    return userSession?.user?.user_metadata?.role === 'eleve' || 
-           userSession?.user?.user_metadata?.role !== 'prof';
   };
 
   // Extraire toutes les spécialités uniques
@@ -411,24 +407,15 @@ function Professeurs() {
                 </div>
               )}
 
-              {/* 🆕 Boutons d'action MODIFIÉS */}
+              {/* 🔧 BOUTONS D'ACTION - VERSION FINALE CORRIGÉE */}
               <div className="professor-actions">
-                {/* 🆕 Bouton de réservation avec modal */}
-                {isStudent() ? (
-                  <button
-                    onClick={() => handleBookingClick(prof)}
-                    className="btn-primary"
-                  >
-                    🎓 Réserver un cours
-                  </button>
-                ) : (
-                  <Link
-                    to={`/reservation?prof_id=${prof.id}`}
-                    className="btn-primary"
-                  >
-                    📅 Réserver un cours
-                  </Link>
-                )}
+                {/* 🔧 Bouton de réservation - TOUS utilisent BookingInterface */}
+                <button
+                  onClick={() => handleBookingClick(prof)}
+                  className="btn-primary"
+                >
+                  🎓 Réserver un cours
+                </button>
                 
                 <Link
                   to={`/professeur/${prof.id}`}

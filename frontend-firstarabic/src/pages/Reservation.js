@@ -1,4 +1,4 @@
-// src/pages/Reservation.js - VERSION CORRIGÉE (sans erreur ESLint)
+// src/pages/Reservation.js - VERSION CORRIGÉE avec nouvelle API booking
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
@@ -123,7 +123,7 @@ function Reservation() {
     return days;
   };
 
-  // 6. Réservation
+  // 6. Réservation - VERSION CORRIGÉE avec nouvelle API
   const handleReservation = async () => {
     if (!selectedTime) {
       alert("⚠️ Veuillez sélectionner un créneau horaire");
@@ -148,45 +148,30 @@ function Reservation() {
       const year = fullDate.getFullYear();
       const month = String(fullDate.getMonth() + 1).padStart(2, '0');
       const day = String(fullDate.getDate()).padStart(2, '0');
-      const hour = String(hours).padStart(2, '0');
-      const minute = String(minutes).padStart(2, '0');
       
-      const localDateString = `${year}-${month}-${day}T${hour}:${minute}:00`;
+      const isoDateString = `${year}-${month}-${day}`;
 
-      // Récupération élève
-      const { data: eleveData } = await axios.get("http://localhost:3001/eleves", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const eleve_id = eleveData.eleves?.[0]?.id;
-      if (!eleve_id) {
-        throw new Error("Élève non trouvé");
-      }
-
+      // 🔧 CORRECTION : Utiliser la nouvelle API /booking/reservations
       const payload = {
-        date: localDateString,
         prof_id: profId,
-        eleve_id,
+        date: isoDateString,
+        heure_debut: selectedTime,
+        duree_minutes: 30,
+        message_eleve: "Réservation depuis l'interface web"
       };
 
-      const res = await axios.post("http://localhost:3001/cours", payload, {
+      const res = await axios.post("http://localhost:3001/booking/reservations", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       console.log("✅ Réservation réussie:", res.data);
-      alert("✅ Cours réservé avec succès !");
+      alert("✅ Demande de cours envoyée avec succès ! Le professeur va confirmer votre réservation.");
       navigate("/dashboard");
     } catch (err) {
       console.error("❌ Erreur lors de la réservation:", err?.response?.data || err.message);
       
-      const errorMessage = err?.response?.data?.message || "Erreur lors de la réservation";
-      const disponibilites = err?.response?.data?.disponibilites_du_jour;
-      
-      if (disponibilites) {
-        alert(`❌ ${errorMessage}\n\nCréneaux disponibles: ${disponibilites.join(', ')}`);
-      } else {
-        alert(`❌ ${errorMessage}`);
-      }
+      const errorMessage = err?.response?.data?.error || "Erreur lors de la réservation";
+      alert(`❌ ${errorMessage}`);
     } finally {
       setReserving(false);
     }

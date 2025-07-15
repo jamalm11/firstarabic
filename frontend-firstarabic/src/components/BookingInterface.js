@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Euro, MessageSquare, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, User, Euro, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 const BookingInterface = ({ profId, profData, onClose }) => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -9,7 +10,24 @@ const BookingInterface = ({ profId, profData, onClose }) => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(false);
-  const [step, setStep] = useState(1); // 1: Date, 2: Créneau, 3: Confirmation
+  const [step, setStep] = useState(1);
+  
+  // 🔧 État pour le token
+  const [token, setToken] = useState(null);
+
+  // 🔧 Récupérer le token au chargement
+  useEffect(() => {
+    const getToken = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        setToken(session.access_token);
+        console.log("✅ Token récupéré dans BookingInterface");
+      } else {
+        console.log("❌ Pas de token dans BookingInterface");
+      }
+    };
+    getToken();
+  }, []);
 
   // Générer les 14 prochains jours
   const getNextDays = () => {
@@ -61,11 +79,15 @@ const BookingInterface = ({ profId, profData, onClose }) => {
   };
 
   const handleBooking = async () => {
-    if (!selectedSlot) return;
+    if (!selectedSlot || !token) {
+      setMessage('❌ Erreur: token manquant');
+      return;
+    }
 
     setBooking(true);
     try {
-      const token = localStorage.getItem('token');
+      console.log("📤 Envoi réservation avec token:", token ? "✅" : "❌");
+      
       const response = await fetch('http://localhost:3001/booking/reservations', {
         method: 'POST',
         headers: {
@@ -82,6 +104,8 @@ const BookingInterface = ({ profId, profData, onClose }) => {
       });
 
       const data = await response.json();
+      console.log("📥 Réponse réservation:", data);
+      
       if (data.success) {
         setStep(4); // Succès
       } else {
